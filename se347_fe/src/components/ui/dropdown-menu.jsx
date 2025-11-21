@@ -1,54 +1,70 @@
-import React from "react";
-import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
-import { cn } from "@/lib/utils";
+import { useRef, useEffect } from "react";
+import { cn } from "@/lib/utils"; // Nếu bạn muốn dùng tiện ích className
 
-const DropdownMenu = DropdownMenuPrimitive.Root;
-const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger;
-const DropdownMenuContent = React.forwardRef(
-  ({ className, sideOffset = 4, children, ...props }, ref) => (
-    <DropdownMenuPrimitive.Portal>
-      <DropdownMenuPrimitive.Content
-        ref={ref}
-        sideOffset={sideOffset}
-        className={cn(
-          "z-50 min-w-32 overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md",
-          className
-        )}
-        {...props}
-      >
-        {children}
-      </DropdownMenuPrimitive.Content>
-    </DropdownMenuPrimitive.Portal>
-  )
-);
-DropdownMenuContent.displayName = "DropdownMenuContent";
+export function DropdownMenu({ children }) {
+  return <div className="relative inline-block">{children}</div>;
+}
 
-const DropdownMenuItem = React.forwardRef(({ className, ...props }, ref) => (
-  <DropdownMenuPrimitive.Item
-    ref={ref}
-    className={cn(
-      "flex cursor-default select-none items-center rounded-sm px-2 py-1 text-sm outline-none",
-      className
-    )}
-    {...props}
-  />
-));
+export function DropdownMenuTrigger({ children, onClick }) {
+  return (
+    <button onClick={onClick} className="rounded-md focus:outline-none">
+      {children}
+    </button>
+  );
+}
 
-const DropdownMenuLabel = (props) => {
-  return <div className="px-2 py-1 text-sm text-gray-500" {...props} />;
-};
+export function DropdownMenuContent({ children, open, setOpen, className }) {
+  const ref = useRef();
 
-const DropdownMenuSeparator = (props) => {
-  return <hr className="my-1 border-t border-gray-200" {...props} />;
-};
+  // Đóng dropdown khi click ra ngoài
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (ref.current && !ref.current.contains(event.target)) {
+        setOpen(false);
+      }
+    }
 
-DropdownMenuItem.displayName = "DropdownMenuItem";
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [setOpen]);
 
-export {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-};
+  if (!open) return null;
+
+  return (
+    <div
+      ref={ref}
+      className={cn(
+        "absolute z-50 mt-1 min-w-32 overflow-hidden rounded-md border bg-white p-1 text-gray-800 shadow-md",
+        className
+      )}
+    >
+      {children}
+    </div>
+  );
+}
+
+export function DropdownMenuItem({ children, onSelect, className }) {
+  return (
+    <div
+      onClick={onSelect}
+      className={cn(
+        "flex cursor-pointer select-none items-center rounded-sm px-2 py-1 text-sm hover:bg-gray-100",
+        className
+      )}
+    >
+      {children}
+    </div>
+  );
+}
+
+export function DropdownMenuLabel({ children, className }) {
+  return (
+    <div className={cn("px-2 py-1 text-sm text-gray-500", className)}>
+      {children}
+    </div>
+  );
+}
+
+export function DropdownMenuSeparator({ className }) {
+  return <hr className={cn("my-1 border-t border-gray-200", className)} />;
+}

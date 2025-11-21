@@ -1,5 +1,5 @@
 import { GraduationCap, BookOpen, BarChart3, Users } from "lucide-react";
-import { Button } from "../components/ui/Button";
+import { Button } from "@/components/ui/button";
 
 export default function Index() {
   return (
@@ -7,7 +7,7 @@ export default function Index() {
       <div className="min-h-screen bg-linear-to-br from-primary/10 via-accent to-primary/5">
         <div className="max-w-7xl mx-auto px-4 py-16">
           <div className="text-center mb-16">
-            <h1 className="text-5xl font-Poppins font-bold mb-4 bg-linear-to-r from-primary to-primary-hover bg-clip-text text-transparent text-bla">
+            <h1 className="text-2xl font-Poppins font-bold mb-4 bg-linear-to-r from-primary to-primary-hover bg-clip-text text-transparent text-bla">
               MyQuizz
             </h1>
 
@@ -20,6 +20,7 @@ export default function Index() {
                 size="lg"
                 variant="outline"
                 onClick={() => navigate("/register")}
+                className="min-w-[200px]"
               >
                 Bắt đầu ngay
               </Button>
@@ -27,6 +28,7 @@ export default function Index() {
                 size="lg"
                 variant="outline"
                 onClick={() => navigate("/login")}
+                className="min-w-[200px]"
               >
                 Đăng nhập
               </Button>
@@ -34,16 +36,18 @@ export default function Index() {
 
             <div className="flex gap-4 justify-center mt-4">
               <Button
-                size="default"
+                size="lg"
                 variant="outline"
                 onClick={() => navigate("/take-quiz")}
+                className="min-w-[200px]"
               >
                 Tham gia bài thi
               </Button>
               <Button
-                size="default"
+                size="lg"
                 variant="outline"
                 onClick={() => navigate("/history")}
+                className="min-w-[200px]"
               >
                 Tra cứu kết quả
               </Button>

@@ -1,0 +1,15 @@
+// jsconfig.json
+{
+  "compilerOptions": {
+    "baseUrl": ".", // Bắt buộc phải có baseUrl để paths hoạt động
+    "paths": {
+      // Biệt danh phải ánh xạ chính xác như trong cấu hình Vite
+      "@/*": ["./src/*"]
+    },
+    // Các tùy chọn khác (Tùy chọn)
+    "jsx": "react-jsx",
+    "target": "ES2020",
+    "module": "esnext"
+  },
+  "include": ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx"]
+}

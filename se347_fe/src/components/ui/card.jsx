@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 const Card = ({ className, children, ...props }) => {
   return (
     <div
-      className={cn("rounded-lg border bg-card p-4 shadow-sm", className)}
+      className={cn("rounded-lg bg-card p-4 shadow-sm", className)}
       {...props}
     >
       {children}
@@ -37,4 +37,23 @@ const CardContent = ({ className, children, ...props }) => (
   </div>
 );
 
-export { Card, CardHeader, CardTitle, CardDescription, CardContent };
+const CardFooter = ({ className, children, ...props }) => (
+  <div
+    className={cn(
+      "pt-4 mt-4 border-t border-muted-foreground/20 flex items-center justify-end",
+      className
+    )}
+    {...props}
+  >
+    {children}
+  </div>
+);
+
+export {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+};

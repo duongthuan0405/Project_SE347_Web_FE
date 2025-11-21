@@ -20,7 +20,7 @@ const navItems = [
 
 export default function Sidebar() {
   return (
-    <aside className="hidden lg:flex w-64 flex-col border-r bg-sidebar">
+    <aside className="hidden lg:flex w-64 flex-col rounded-r-2xl bg-sidebar-background">
       <div className="p-6">
         <h1 className="text-2xl font-bold text-sidebar-foreground">MyQuizz</h1>
         <p className="text-sm text-sidebar-foreground/80 mt-1">
