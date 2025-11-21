@@ -23,30 +23,49 @@ const DialogOverlay = React.forwardRef(({ className, ...props }, ref) => (
 DialogOverlay.displayName = "DialogOverlay";
 
 const DialogContent = React.forwardRef(({ className, children, ...props }, ref) => (
-  <DialogPrimitive.Content
-    ref={ref}
-    className={cn("fixed z-50 grid w-full max-w-lg gap-4 rounded-lg bg-white p-6 shadow-lg", className)}
-    {...props}
-  >
-    {children}
-    <DialogPrimitive.Close asChild>
-      <button className="mt-2 px-4 py-2">Close</button>
-    </DialogPrimitive.Close>
-  </DialogPrimitive.Content>
+  <DialogPortal>
+    <DialogOverlay />
+    <DialogPrimitive.Content
+      ref={ref}
+      className={cn(
+        "fixed z-50 grid w-full max-w-lg gap-4 rounded-lg bg-background p-6 shadow-lg",
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </DialogPrimitive.Content>
+  </DialogPortal>
 ));
 DialogContent.displayName = "DialogContent";
 
-const DialogTitle = React.forwardRef(({ className, children, ...props }, ref) => (
-  <DialogPrimitive.Title ref={ref} className={cn("text-lg font-semibold", className)} {...props}>
+const DialogHeader = ({ className, children, ...props }) => (
+  <div className={cn("flex flex-col space-y-1.5 text-center sm:text-left", className)} {...props}>
     {children}
-  </DialogPrimitive.Title>
+  </div>
+);
+
+const DialogFooter = ({ className, children, ...props }) => (
+  <div className={cn("flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2", className)} {...props}>
+    {children}
+  </div>
+);
+
+const DialogTitle = React.forwardRef(({ className, ...props }, ref) => (
+  <DialogPrimitive.Title
+    ref={ref}
+    className={cn("text-lg font-semibold leading-none tracking-tight", className)}
+    {...props}
+  />
 ));
 DialogTitle.displayName = "DialogTitle";
 
-const DialogDescription = React.forwardRef(({ className, children, ...props }, ref) => (
-  <DialogPrimitive.Description ref={ref} className={cn("text-sm text-muted-foreground", className)} {...props}>
-    {children}
-  </DialogPrimitive.Description>
+const DialogDescription = React.forwardRef(({ className, ...props }, ref) => (
+  <DialogPrimitive.Description
+    ref={ref}
+    className={cn("text-sm text-muted-foreground", className)}
+    {...props}
+  />
 ));
 DialogDescription.displayName = "DialogDescription";
 
