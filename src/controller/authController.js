@@ -1,50 +1,86 @@
-import { supabase } from "@/lib/supabaseClient";
+// src/controller/authController.js
+// Mock Authentication Controller - không dùng Supabase
 
-export async function createUser(name, email, password) {
-  try {
-    const { data: user, error } = await supabase
-      .from("users")
-      .insert([{ name, email, password }])
-      .select()
-      .single();
+const USERS_KEY = "exam_users";
+const CURRENT_USER_KEY = "exam_current_user";
 
-    if (error) throw error;
-    return { user };
-  } catch (error) {
-    console.error("Error creating user:", error.message);
-    return { error: error.message };
-  }
-}
+const getUsers = () => {
+  const data = localStorage.getItem(USERS_KEY);
+  return data ? JSON.parse(data) : [];
+};
 
-export async function loginUser(email, password) {
-  try {
-    const { data: user, error } = await supabase
-      .from("users")
-      .select("*")
-      .eq("email", email)
-      .eq("password", password)
-      .single();
+const saveUsers = (users) => {
+  localStorage.setItem(USERS_KEY, JSON.stringify(users));
+};
 
-    if (error) throw error;
-    return { user };
-  } catch (error) {
-    console.error("Login failed:", error.message);
-    return { error: error.message };
-  }
-}
+export const authController = {
+  // Đăng ký user
+  async handleRegister({ name, email, password }) {
+    const users = getUsers();
 
-export async function getUserById(userId) {
-  try {
-    const { data: user, error } = await supabase
-      .from("users")
-      .select("*")
-      .eq("id", userId)
-      .single();
+    // Kiểm tra email đã tồn tại
+    const exists = users.find((u) => u.email === email);
+    if (exists) {
+      return { success: false, message: "Email đã được sử dụng" };
+    }
 
-    if (error) throw error;
-    return { user };
-  } catch (error) {
-    console.error("Error fetching user:", error.message);
-    return { error: error.message };
-  }
-}
+    const newUser = {
+      id: `user_${Date.now()}`,
+      name,
+      email,
+      password,
+      createdAt: new Date().toISOString(),
+    };
+
+    users.push(newUser);
+    saveUsers(users);
+
+    // Tự đăng nhập
+    localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(newUser));
+
+    return { success: true, user: newUser };
+  },
+
+  // Đăng nhập
+  async handleLogin({ email, password }) {
+    const users = getUsers();
+
+    const user = users.find(
+      (u) => u.email === email && u.password === password
+    );
+
+    if (!user) {
+      return { success: false, message: "Email hoặc mật khẩu không đúng" };
+    }
+
+    localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
+
+    return { success: true, user };
+  },
+
+  // Lấy user hiện tại
+  getCurrentUser() {
+    const data = localStorage.getItem(CURRENT_USER_KEY);
+    return data ? JSON.parse(data) : null;
+  },
+
+  // Kiểm tra đã đăng nhập
+  isAuthenticated() {
+    return !!localStorage.getItem(CURRENT_USER_KEY);
+  },
+
+  // Đăng xuất
+  handleLogout() {
+    localStorage.removeItem(CURRENT_USER_KEY);
+  },
+
+  // Lấy user theo ID
+  async getUserById(id) {
+    const users = getUsers();
+    const user = users.find((u) => u.id === id);
+
+    if (!user) return { success: false, message: "User không tồn tại" };
+
+    return { success: true, user };
+  },
+};
