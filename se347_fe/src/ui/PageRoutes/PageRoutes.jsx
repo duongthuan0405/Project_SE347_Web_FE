@@ -11,6 +11,8 @@ import Participants from "@/Pages/Participants";
 import AIGenerate from "@/Pages/AIGenerate";
 import EditQuiz from "@/Pages/EditQuiz";
 import QuizDetail from "@/Pages/QuizDetail";
+import Reports from "@/Pages/Reports";
+import TakeQuizEntry from "@/Pages/TakeQuizEntry";
 
 export default function PageRoutes() {
   return (
@@ -19,7 +21,7 @@ export default function PageRoutes() {
         {/* 
        
         
-        <Route path="/take-quiz" element={<TakeQuizEntry />} />
+        
         
         <Route path="/quiz-completed" element={<QuizCompleted />} />
         
@@ -29,7 +31,7 @@ export default function PageRoutes() {
         
         
         
-        <Route path="/reports" element={<Reports />} />
+        
         <Route path="/reports/:id" element={<Reports />} />
         <Route path="/invite" element={<Invite />} />
         <Route path="*" element={<NotFound />} /> */}
@@ -46,6 +48,8 @@ export default function PageRoutes() {
         <Route path="/ai-generate" element={<AIGenerate />} />
         <Route path="/quizzes/:id/edit" element={<EditQuiz />} />
         <Route path="/quizzes/:id" element={<QuizDetail />} />
+        <Route path="/reports/:id" element={<Reports />} />
+        <Route path="/take-quiz" element={<TakeQuizEntry />} />
       </Route>
     </Routes>
   );

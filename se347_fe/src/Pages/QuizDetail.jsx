@@ -264,7 +264,6 @@ export default function QuizDetail() {
           {showQuestionForm && (
             <QuestionForm
               quizId={id}
-              question={editingQuestion}
               onSuccess={() => {
                 setShowQuestionForm(false);
                 setEditingQuestion(null);
@@ -278,7 +277,7 @@ export default function QuizDetail() {
           )}
 
           {questions.length === 0 ? (
-            <Card>
+            <Card className="bg-black/5">
               <CardContent className="py-12 text-center">
                 <p className="text-muted-foreground mb-4">
                   Chưa có câu hỏi nào
@@ -291,71 +290,97 @@ export default function QuizDetail() {
             </Card>
           ) : (
             <div className="space-y-4">
-              {questions.map((question, index) => (
-                <Card key={question.id}>
-                  <CardHeader className="flex flex-col items-start">
-                    <div className="flex items-center space-x-5">
-                      <div className="w-fit h-fit">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Badge variant="outline">Câu {index + 1}</Badge>
-                          <Badge>{question.score} điểm</Badge>
+              {questions.map(function (question, index) {
+                if (
+                  editingQuestion != null &&
+                  question.id === editingQuestion.id
+                ) {
+                  return (
+                    <QuestionForm
+                      quizId={id}
+                      question={editingQuestion}
+                      onSuccess={() => {
+                        setEditingQuestion(null);
+                        loadData();
+                      }}
+                      onCancel={() => {
+                        setEditingQuestion(null);
+                      }}
+                    />
+                  );
+                } else {
+                  return (
+                    <Card key={question.id} className="bg-black/5">
+                      <CardHeader className="flex flex-col items-start">
+                        <div className="flex items-center space-x-5 mb-5">
+                          <div className="w-fit items-stretch">
+                            <div className="flex items-center gap-2">
+                              <Badge variant="outline" className="text-[16px]">
+                                Câu {index + 1}
+                              </Badge>
+                              <Badge className="text-[16px]">
+                                {question.score} điểm
+                              </Badge>
+                            </div>
+                          </div>
+
+                          <div className="flex gap-2 justify-center">
+                            <Button
+                              variant="ghost"
+                              onClick={() => {
+                                setEditingQuestion(question);
+                              }}
+                              className="py-1 px-0 h-full"
+                            >
+                              <Edit className="w-full h-full text-primary" />
+                            </Button>
+
+                            <Button
+                              variant="ghost"
+                              onClick={() => handleDeleteQuestion(question.id)}
+                              className="py-1 px-0 h-full"
+                            >
+                              <Trash2 className="w-full h-full text-red-500" />
+                            </Button>
+                          </div>
                         </div>
-                      </div>
 
-                      <div className="flex gap-2 justify-center">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => {
-                            setEditingQuestion(question);
-                            setShowQuestionForm(true);
-                          }}
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Button>
+                        <CardTitle className="text-lg">
+                          {question.content}
+                        </CardTitle>
+                      </CardHeader>
 
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDeleteQuestion(question.id)}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </div>
+                      <CardContent>
+                        <div className="space-y-2">
+                          {question.options.map(function (option, optIndex) {
+                            return (
+                              <div
+                                key={optIndex}
+                                className={`p-3 rounded-lg ${
+                                  optIndex === question.correctOption
+                                    ? "bg-success/10 border-success"
+                                    : "bg-white"
+                                }`}
+                              >
+                                <span className="font-medium mr-2">
+                                  {String.fromCharCode(65 + optIndex)}.
+                                </span>
+                                {option}
 
-                    <CardTitle className="text-lg">
-                      {question.content}
-                    </CardTitle>
-                  </CardHeader>
-
-                  <CardContent>
-                    <div className="space-y-2">
-                      {question.options.map((option, optIndex) => (
-                        <div
-                          key={optIndex}
-                          className={`p-3 rounded-lg border ${
-                            optIndex === question.correctOption
-                              ? "bg-success/10 border-success"
-                              : "bg-muted/50"
-                          }`}
-                        >
-                          <span className="font-medium mr-2">
-                            {String.fromCharCode(65 + optIndex)}.
-                          </span>
-                          {option}
-
-                          {optIndex === question.correctOption && (
-                            <Badge className="ml-2 bg-success text-white">
-                              Đáp án đúng
-                            </Badge>
-                          )}
+                                {optIndex === question.correctOption && (
+                                  <Badge className="ml-2 bg-success text-white">
+                                    Đáp án đúng
+                                  </Badge>
+                                )}
+                              </div>
+                            );
+                          })}
                         </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                      </CardContent>
+                    </Card>
+                  );
+                }
+              })}
             </div>
           )}
         </TabsContent>

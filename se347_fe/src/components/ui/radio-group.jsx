@@ -1,56 +1,45 @@
-import React, { useState, useEffect } from "react";
+import { cn } from "@/lib/utils";
+import React from "react";
 
-// RadioGroup wrapper
-export function RadioGroup({ initValue, onChange, children, name, className }) {
-  const [selectedValue, setSelectedValue] = useState(initValue || "");
-
-  // Đồng bộ khi initValue thay đổi từ bên ngoài
-  useEffect(() => {
-    if (initValue !== undefined) {
-      setSelectedValue(initValue);
-    }
-  }, [initValue]);
-
+export function RadioGroup({
+  currentSelectedValue,
+  onChange,
+  name,
+  children,
+  className,
+}) {
   const enhancedChildren = React.Children.map(children, (child) => {
     if (!React.isValidElement(child)) return child;
-
     return React.cloneElement(child, {
       name,
-      checked: child.props.value === selectedValue,
-      onChange: (e) => {
-        const val = e.target.value;
-        setSelectedValue(val); // Cập nhật state
-        onChange && onChange(val); // Gửi value ra ngoài nếu có
-      },
+      checked: child.props.value === currentSelectedValue,
+      onChange: (e) => onChange(e.target.value),
     });
   });
 
   return <div className={className}>{enhancedChildren}</div>;
 }
 
-// RadioGroupItem
-export function RadioGroupItem({ value, checked, onChange, className }) {
+export function RadioItem({
+  children,
+  value,
+  checked,
+  onChange,
+  name,
+  className,
+}) {
   return (
     <label
-      className={`flex items-center cursor-pointer space-x-2 ${
-        className || ""
-      }`}
+      className={cn("flex items-center space-x-5 cursor-pointer", className)}
     >
       <input
         type="radio"
+        name={name}
         value={value}
         checked={checked}
         onChange={onChange}
-        className="sr-only"
       />
-      <span
-        className={`h-4 w-4 rounded-full border border-primary flex items-center justify-center ${
-          checked ? "bg-primary" : "bg-white"
-        }`}
-      >
-        {checked && <span className="h-2 w-2 bg-white rounded-full" />}
-      </span>
-      <span>{value}</span>
+      {children}
     </label>
   );
 }

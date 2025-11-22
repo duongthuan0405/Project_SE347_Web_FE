@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { RadioGroup, RadioItem } from "@/components/ui/radio-group";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 // Fake services
@@ -80,7 +80,7 @@ export function QuestionForm({
   };
 
   return (
-    <Card>
+    <Card className="bg-black/5">
       <CardHeader>
         <CardTitle>
           {question ? "Chỉnh sửa câu hỏi" : "Thêm câu hỏi mới"}
@@ -102,27 +102,30 @@ export function QuestionForm({
             />
           </div>
 
-          <div className="space-y-4">
+          <div className="flex flex-col space-y-2">
             <Label>Các đáp án *</Label>
             <RadioGroup
-              value={formData.correctOption}
-              onChange={(value) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  correctOption: parseInt(value),
-                }))
-              }
+              name="f"
+              className="w-[600px] flex flex-col space-y-5"
+              currentSelectedValue={formData.correctOption}
+              onChange={function (value) {
+                setFormData(function (p) {
+                  return {
+                    ...p,
+                    correctOption: Number(value),
+                  };
+                });
+              }}
             >
               {formData.options.map((option, index) => (
-                <div key={index} className="flex items-center gap-2 py-1">
-                  <RadioGroupItem value={index.toString()} />
+                <RadioItem value={index} className="w-full">
                   <Input
                     value={option}
                     onChange={(e) => handleOptionChange(index, e.target.value)}
                     required
-                    className="flex-1 focus:outline-none focus:ring-accent-foreground focus:ring-2 bg-white"
+                    className="flex-1 focus:outline-none focus:ring-accent-foreground focus:ring-2 bg-white w-full"
                   />
-                </div>
+                </RadioItem>
               ))}
             </RadioGroup>
           </div>
@@ -141,7 +144,7 @@ export function QuestionForm({
                 }))
               }
               required
-              className="w-32"
+              className="flex-1 focus:outline-none focus:ring-accent-foreground focus:ring-2 bg-white w-32"
             />
           </div>
 
