@@ -20,10 +20,10 @@ export default function PageRoutes() {
        
         
         <Route path="/take-quiz" element={<TakeQuizEntry />} />
-        <Route path="/take/:id" element={<TakeQuiz />} />
+        
         <Route path="/quiz-completed" element={<QuizCompleted />} />
         
-        
+        <Route path="/take/:id" element={<TakeQuiz />} />
         
         
         

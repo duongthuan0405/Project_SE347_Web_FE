@@ -43,10 +43,10 @@ export function DropdownMenuContent({ children, open, setOpen, className }) {
   );
 }
 
-export function DropdownMenuItem({ children, onSelect, className }) {
+export function DropdownMenuItem({ children, onSelect, className, item }) {
   return (
     <div
-      onClick={onSelect}
+      onClick={(e) => onSelect(item)}
       className={cn(
         "flex cursor-pointer select-none items-center rounded-sm px-2 py-1 text-sm hover:bg-gray-100",
         className

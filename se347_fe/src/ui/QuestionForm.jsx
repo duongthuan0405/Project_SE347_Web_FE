@@ -67,7 +67,7 @@ export function QuestionForm({
         title: question ? "Cập nhật thành công" : "Thêm câu hỏi thành công",
         description: "Câu hỏi đã được lưu",
       });
-      onSuccess();
+      onSuccess?.(formData);
     } else {
       toast({
         title: "Lỗi",
@@ -89,7 +89,7 @@ export function QuestionForm({
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="content">Nội dung câu hỏi *</Label>
+            <Label>Nội dung câu hỏi *</Label>
             <Textarea
               id="content"
               value={formData.content}
@@ -98,13 +98,14 @@ export function QuestionForm({
               }
               required
               rows={3}
+              className="resize-none  focus:outline-none focus:ring-accent-foreground focus:ring-2 bg-white"
             />
           </div>
 
           <div className="space-y-4">
             <Label>Các đáp án *</Label>
             <RadioGroup
-              value={formData.correctOption.toString()}
+              value={formData.correctOption}
               onChange={(value) =>
                 setFormData((prev) => ({
                   ...prev,
@@ -113,13 +114,13 @@ export function QuestionForm({
               }
             >
               {formData.options.map((option, index) => (
-                <div key={index} className="flex items-center gap-3">
+                <div key={index} className="flex items-center gap-2 py-1">
                   <RadioGroupItem value={index.toString()} />
                   <Input
                     value={option}
                     onChange={(e) => handleOptionChange(index, e.target.value)}
                     required
-                    className="flex-1"
+                    className="flex-1 focus:outline-none focus:ring-accent-foreground focus:ring-2 bg-white"
                   />
                 </div>
               ))}

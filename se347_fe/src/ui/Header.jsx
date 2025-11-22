@@ -17,6 +17,25 @@ export function Header() {
   function openDropDown() {
     setIsOpen(true);
   }
+
+  const optionsMenu = {
+    PROFILE: {
+      id: 0,
+      name: "Hồ sơ",
+      icon: User,
+    },
+
+    LOGOUT: {
+      id: 1,
+      name: "Đăng xuất",
+      icon: LogOut,
+    },
+
+    asArray() {
+      return Object.values(this).filter((prop) => typeof prop !== "function");
+    },
+  };
+
   return (
     <header className="bg-card shadow-xl h-16 aspect-square flex items-center justify-between px-6 py-2">
       <div>
@@ -44,22 +63,23 @@ export function Header() {
         >
           <DropdownMenuLabel>Tài khoản của tôi</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem
-            onSelect={function (e) {
-              setIsOpen(false);
-            }}
-          >
-            <User className="w-4 h-4 mr-2" />
-            Hồ sơ
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onSelect={function (e) {
-              setIsOpen(false);
-            }}
-          >
-            <LogOut className="w-4 h-4 mr-2" />
-            Đăng xuất
-          </DropdownMenuItem>
+          {optionsMenu.asArray().map(function (item, index) {
+            return (
+              <DropdownMenuItem
+                key={item.id}
+                item={item}
+                onSelect={function (selectedItem) {
+                  if (selectedItem === null) {
+                    selectedItem = item;
+                  }
+                  console.log(selectedItem);
+                }}
+              >
+                {<item.icon className="w-4 h-4 me-2" />}
+                {item.name}
+              </DropdownMenuItem>
+            );
+          })}
         </DropdownMenuContent>
       </DropdownMenu>
     </header>

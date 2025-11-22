@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
@@ -20,83 +20,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { QuestionForm } from "@/ui/QuestionForm";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-// ----- Fake Toast -----
-function useToast() {
-  return {
-    toast: ({ title, description }) => alert(`${title}\n${description || ""}`),
-  };
-}
-
-// ----- Fake Services -----
-const fakeQuiz = {
-  id: "1",
-  title: "Bài thi Toán cơ bản",
-  description: "Kiểm tra kiến thức Toán lớp 10",
-  code: "QZ1234",
-  questionCount: 3,
-  duration: 60,
-  totalScore: 10,
-};
-
-let fakeQuestions = [
-  {
-    id: "q1",
-    content: "2 + 2 = ?",
-    options: ["3", "4", "5", "6"],
-    correctOption: 1,
-    score: 1,
-  },
-  {
-    id: "q2",
-    content: "5 * 3 = ?",
-    options: ["15", "10", "20", "25"],
-    correctOption: 0,
-    score: 2,
-  },
-];
-
-const quizController = {
-  getQuizWithQuestions: async (id) => {
-    return new Promise((resolve) => {
-      setTimeout(
-        () => resolve({ quiz: fakeQuiz, questions: fakeQuestions }),
-        500
-      );
-    });
-  },
-  updateQuiz: async (id, data) => {
-    fakeQuiz.code = data.code || fakeQuiz.code;
-    return { success: true };
-  },
-};
-
-const questionService = {
-  delete: async (questionId) => {
-    fakeQuestions = fakeQuestions.filter((q) => q.id !== questionId);
-    return { success: true };
-  },
-  create: async (quizId, data) => {
-    const newQ = { id: "q" + (fakeQuestions.length + 1), ...data };
-    fakeQuestions.push(newQ);
-    return { success: true };
-  },
-  update: async (questionId, data) => {
-    fakeQuestions = fakeQuestions.map((q) =>
-      q.id === questionId ? { ...q, ...data } : q
-    );
-    return { success: true };
-  },
-};
-
-// ----- Main Component -----
 export default function QuizDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   const [quiz, setQuiz] = useState(null);
   const [questions, setQuestions] = useState([]);
@@ -105,13 +36,52 @@ export default function QuizDetail() {
   const [showQuestionForm, setShowQuestionForm] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState(null);
 
+  // ---------- FAKE DATA ----------
   const loadData = async () => {
-    if (!id) return;
-    const data = await quizController.getQuizWithQuestions(id);
-    if (data) {
-      setQuiz(data.quiz);
-      setQuestions(data.questions);
-    }
+    // fake delay
+    await new Promise((resolve) => setTimeout(resolve, 300));
+
+    const fakeQuiz = {
+      id: id || "1",
+      title: "Bài kiểm tra mẫu",
+      description: "Đây là bài kiểm tra demo",
+      code: "QZ1234",
+      questionCount: 3,
+      duration: 15,
+      totalScore: 30,
+    };
+
+    const fakeQuestions = [
+      {
+        id: "q1",
+        content: "Câu hỏi số 1: Thủ đô của Việt Nam là?",
+        score: 10,
+        options: ["Hà Nội", "TP. Hồ Chí Minh", "Đà Nẵng", "Huế"],
+        correctOption: 0,
+      },
+      {
+        id: "q2",
+        content: "Câu hỏi số 2: Ngôn ngữ lập trình phổ biến nhất hiện nay?",
+        score: 10,
+        options: ["Python", "C#", "JavaScript", "Java"],
+        correctOption: 2,
+      },
+      {
+        id: "q3",
+        content: "Câu hỏi số 3: React là gì?",
+        score: 10,
+        options: [
+          "Framework backend",
+          "Framework frontend",
+          "Thư viện frontend",
+          "Ngôn ngữ lập trình",
+        ],
+        correctOption: 2,
+      },
+    ];
+
+    setQuiz(fakeQuiz);
+    setQuestions(fakeQuestions);
     setIsLoading(false);
   };
 
@@ -119,41 +89,63 @@ export default function QuizDetail() {
     loadData();
   }, [id]);
 
-  const handleDeleteQuestion = async (questionId) => {
+  // ---------- HANDLERS ----------
+  const handleDeleteQuestion = (questionId) => {
     if (!confirm("Bạn có chắc chắn muốn xóa câu hỏi này?")) return;
-    const result = await questionService.delete(questionId);
-    if (result.success) {
-      toast({ title: "Xóa thành công" });
-      loadData();
-    }
+
+    setQuestions((prev) => prev.filter((q) => q.id !== questionId));
+    toast({
+      title: "Xóa thành công",
+      description: "Câu hỏi đã được xóa",
+    });
   };
 
   const handleCopyLink = () => {
     const link = `${window.location.origin}/take/${quiz?.code || id}`;
     navigator.clipboard.writeText(link);
-    toast({ title: "Đã sao chép link" });
+    toast({
+      title: "Đã sao chép",
+      description: "Link tham gia bài thi đã được sao chép",
+    });
   };
 
-  const handleGenerateCode = async () => {
+  const handleGenerateCode = () => {
     const newCode = `QZ${Math.random()
       .toString(36)
       .substring(2, 8)
       .toUpperCase()}`;
-    await quizController.updateQuiz(id, { code: newCode });
-    setQuiz((prev) => ({ ...prev, code: newCode }));
-    toast({ title: "Đã tạo mã mới", description: newCode });
+    setQuiz((prev) => (prev ? { ...prev, code: newCode } : null));
+    toast({
+      title: "Đã tạo mã mới",
+      description: `Mã bài thi: ${newCode}`,
+    });
   };
 
-  if (isLoading) return <div className="text-center py-8">Đang tải...</div>;
-  if (!quiz)
+  const handleCopyCode = () => {
+    if (quiz?.code) {
+      navigator.clipboard.writeText(quiz.code);
+      toast({
+        title: "Đã sao chép",
+        description: "Mã bài thi đã được sao chép",
+      });
+    }
+  };
+
+  // ---------- RENDER ----------
+  if (isLoading) {
+    return <div className="text-center py-8">Đang tải...</div>;
+  }
+
+  if (!quiz) {
     return <div className="text-center py-8">Không tìm thấy bài thi</div>;
+  }
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" onClick={() => navigate("/")}>
+          <Button variant="ghost" onClick={() => navigate("/dashboard")}>
             <ArrowLeft className="w-4 h-4 mr-2" />
             Quay lại
           </Button>
@@ -162,22 +154,95 @@ export default function QuizDetail() {
             <p className="text-muted-foreground mt-1">{quiz.description}</p>
           </div>
         </div>
+
+        <Button variant="outline" onClick={() => navigate(`/reports/${id}`)}>
+          <BarChart className="w-4 h-4 mr-2" />
+          Thống kê
+        </Button>
       </div>
 
-      {/* Mã và link */}
+      {/* Mã bài thi + Link */}
       <Card>
         <CardHeader>
           <CardTitle>Truy cập bài thi</CardTitle>
           <CardDescription>Mã và đường link để chia sẻ bài thi</CardDescription>
         </CardHeader>
+
         <CardContent className="space-y-4">
-          <div className="flex gap-2">
-            <Input value={quiz.code} readOnly className="font-mono text-lg" />
-            <Button onClick={handleCopyLink}>Sao chép link</Button>
-            <Button onClick={handleGenerateCode}>Tạo mã mới</Button>
+          {/* Mã bài thi */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">Mã bài thi</Label>
+            <div className="flex gap-2">
+              <Input
+                value={quiz.code || ""}
+                readOnly
+                className="font-mono text-lg"
+              />
+              <Button variant="outline" onClick={handleCopyCode}>
+                <Copy className="w-4 h-4" />
+              </Button>
+              <Button
+                variant="outline"
+                className="min-w-[200px]"
+                onClick={handleGenerateCode}
+              >
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Tạo mã mới
+              </Button>
+            </div>
+          </div>
+
+          {/* Link */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">Đường link tham gia</Label>
+            <div className="flex gap-2">
+              <Input
+                value={`${window.location.origin}/take/${quiz.code || id}`}
+                readOnly
+                className="text-sm"
+              />
+              <Button
+                variant="outline"
+                className="min-w-[200px]"
+                onClick={handleCopyLink}
+              >
+                <LinkIcon className="w-4 h-4 mr-2" />
+                Sao chép
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
+
+      {/* Statistics */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium">Số câu hỏi</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold">{quiz.questionCount}</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium">Thời lượng</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold">{quiz.duration} phút</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium">Tổng điểm</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold">{quiz.totalScore}</p>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Tabs */}
       <Tabs defaultValue="questions">
@@ -186,6 +251,7 @@ export default function QuizDetail() {
           <TabsTrigger value="settings">Cài đặt</TabsTrigger>
         </TabsList>
 
+        {/* Tab — Questions */}
         <TabsContent value="questions" className="space-y-4">
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-semibold">Danh sách câu hỏi</h2>
@@ -224,76 +290,84 @@ export default function QuizDetail() {
               </CardContent>
             </Card>
           ) : (
-            questions.map((question, index) => (
-              <Card key={question.id}>
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Badge variant="outline">Câu {index + 1}</Badge>
-                        <Badge>{question.score} điểm</Badge>
+            <div className="space-y-4">
+              {questions.map((question, index) => (
+                <Card key={question.id}>
+                  <CardHeader className="flex flex-col items-start">
+                    <div className="flex items-center space-x-5">
+                      <div className="w-fit h-fit">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="outline">Câu {index + 1}</Badge>
+                          <Badge>{question.score} điểm</Badge>
+                        </div>
                       </div>
-                      <CardTitle className="text-lg">
-                        {question.content}
-                      </CardTitle>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          setEditingQuestion(question);
-                          setShowQuestionForm(true);
-                        }}
-                      >
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDeleteQuestion(question.id)}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </CardHeader>
 
-                <CardContent>
-                  <div className="space-y-2">
-                    {question.options.map((option, optIndex) => (
-                      <div
-                        key={optIndex}
-                        className={`p-3 rounded-lg border ${
-                          optIndex === question.correctOption
-                            ? "bg-green-100 border-green-500"
-                            : "bg-gray-50"
-                        }`}
-                      >
-                        <span className="font-medium mr-2">
-                          {String.fromCharCode(65 + optIndex)}.
-                        </span>
-                        {option}
-                        {optIndex === question.correctOption && (
-                          <Badge className="ml-2 bg-green-500 text-white">
-                            Đáp án đúng
-                          </Badge>
-                        )}
+                      <div className="flex gap-2 justify-center">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setEditingQuestion(question);
+                            setShowQuestionForm(true);
+                          }}
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteQuestion(question.id)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
                       </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            ))
+                    </div>
+
+                    <CardTitle className="text-lg">
+                      {question.content}
+                    </CardTitle>
+                  </CardHeader>
+
+                  <CardContent>
+                    <div className="space-y-2">
+                      {question.options.map((option, optIndex) => (
+                        <div
+                          key={optIndex}
+                          className={`p-3 rounded-lg border ${
+                            optIndex === question.correctOption
+                              ? "bg-success/10 border-success"
+                              : "bg-muted/50"
+                          }`}
+                        >
+                          <span className="font-medium mr-2">
+                            {String.fromCharCode(65 + optIndex)}.
+                          </span>
+                          {option}
+
+                          {optIndex === question.correctOption && (
+                            <Badge className="ml-2 bg-success text-white">
+                              Đáp án đúng
+                            </Badge>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           )}
         </TabsContent>
 
-        <TabsContent value="settings" className="space-y-4">
+        {/* Tab — Settings */}
+        <TabsContent value="settings">
           <Card>
             <CardHeader>
               <CardTitle>Cài đặt bài thi</CardTitle>
               <CardDescription>Chỉnh sửa thông tin cơ bản</CardDescription>
             </CardHeader>
+
             <CardContent>
               <Button onClick={() => navigate(`/quizzes/${id}/edit`)}>
                 <Edit className="w-4 h-4 mr-2" />

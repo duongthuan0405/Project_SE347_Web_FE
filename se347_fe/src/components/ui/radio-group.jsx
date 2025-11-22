@@ -1,14 +1,27 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 // RadioGroup wrapper
-export function RadioGroup({ value, onChange, children, name, className }) {
-  // clone children để thêm props
+export function RadioGroup({ initValue, onChange, children, name, className }) {
+  const [selectedValue, setSelectedValue] = useState(initValue || "");
+
+  // Đồng bộ khi initValue thay đổi từ bên ngoài
+  useEffect(() => {
+    if (initValue !== undefined) {
+      setSelectedValue(initValue);
+    }
+  }, [initValue]);
+
   const enhancedChildren = React.Children.map(children, (child) => {
     if (!React.isValidElement(child)) return child;
+
     return React.cloneElement(child, {
       name,
-      checked: child.props.value === value,
-      onChange: (e) => onChange(e.target.value),
+      checked: child.props.value === selectedValue,
+      onChange: (e) => {
+        const val = e.target.value;
+        setSelectedValue(val); // Cập nhật state
+        onChange && onChange(val); // Gửi value ra ngoài nếu có
+      },
     });
   });
 
@@ -37,6 +50,7 @@ export function RadioGroupItem({ value, checked, onChange, className }) {
       >
         {checked && <span className="h-2 w-2 bg-white rounded-full" />}
       </span>
+      <span>{value}</span>
     </label>
   );
 }
