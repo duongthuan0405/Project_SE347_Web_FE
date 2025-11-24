@@ -24,80 +24,78 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { QuestionForm } from "@/ui/QuestionForm";
+import {
+  useGetQuizDetailById,
+  useRemoveQuestionFromQuiz,
+  useToggleQuestionInQuiz,
+} from "@/api/data_hooks/quizHook";
+import LoadingOverlay from "@/ui/LoadingOverlay";
+import toastHelper from "@/helper/toastHelper";
 
 export default function QuizDetail() {
+  // get param from route
   const { id } = useParams();
-  const navigate = useNavigate();
 
+  // state hook
   const [quiz, setQuiz] = useState(null);
   const [questions, setQuestions] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
 
   const [showQuestionForm, setShowQuestionForm] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState(null);
 
-  // ---------- FAKE DATA ----------
-  const loadData = async () => {
-    // fake delay
-    await new Promise((resolve) => setTimeout(resolve, 300));
+  // get quiz detail hook
+  const getQuizDetail = useGetQuizDetailById(id);
+  useEffect(
+    function () {
+      if (getQuizDetail.isSuccess) {
+        setQuiz(getQuizDetail.data.quiz);
+        setQuestions(getQuizDetail.data.questions);
+      }
 
-    const fakeQuiz = {
-      id: id || "1",
-      title: "Bài kiểm tra mẫu",
-      description: "Đây là bài kiểm tra demo",
-      code: "QZ1234",
-      questionCount: 3,
-      duration: 15,
-      totalScore: 30,
-    };
+      if (getQuizDetail.isError) {
+      }
+    },
+    [getQuizDetail.data, getQuizDetail.isError, getQuizDetail.isSuccess]
+  );
+  const navigate = useNavigate();
 
-    const fakeQuestions = [
-      {
-        id: "q1",
-        content: "Câu hỏi số 1: Thủ đô của Việt Nam là?",
-        score: 10,
-        options: ["Hà Nội", "TP. Hồ Chí Minh", "Đà Nẵng", "Huế"],
-        correctOption: 0,
-      },
-      {
-        id: "q2",
-        content: "Câu hỏi số 2: Ngôn ngữ lập trình phổ biến nhất hiện nay?",
-        score: 10,
-        options: ["Python", "C#", "JavaScript", "Java"],
-        correctOption: 2,
-      },
-      {
-        id: "q3",
-        content: "Câu hỏi số 3: React là gì?",
-        score: 10,
-        options: [
-          "Framework backend",
-          "Framework frontend",
-          "Thư viện frontend",
-          "Ngôn ngữ lập trình",
-        ],
-        correctOption: 2,
-      },
-    ];
+  // add or update question
+  const toggleQuestion = useToggleQuestionInQuiz();
+  useEffect(
+    function () {
+      if (toggleQuestion.isSuccess) {
+        toastHelper.success("Cập nhật câu hỏi thành công!");
+        getQuizDetail.refetch();
+      }
+      if (toggleQuestion.isError) {
+        toastHelper.error(toggleQuestion.error.message);
+      }
+    },
+    [toggleQuestion.data, toggleQuestion.isError, toggleQuestion.isSuccess]
+  );
 
-    setQuiz(fakeQuiz);
-    setQuestions(fakeQuestions);
-    setIsLoading(false);
-  };
-
-  useEffect(() => {
-    loadData();
-  }, [id]);
+  // delete question from quiz
+  const deleteQuestionFromQuiz = useRemoveQuestionFromQuiz();
+  useEffect(
+    function () {
+      if (deleteQuestionFromQuiz.isSuccess) {
+        toastHelper.success("Xóa câu hỏi khỏi bài kiểm tra thành công!");
+        getQuizDetail.refetch();
+      }
+      if (deleteQuestionFromQuiz.isError) {
+        toastHelper.error(deleteQuestionFromQuiz.error.message);
+      }
+    },
+    [
+      deleteQuestionFromQuiz.data,
+      deleteQuestionFromQuiz.isSuccess,
+      deleteQuestionFromQuiz.isError,
+    ]
+  );
 
   // ---------- HANDLERS ----------
   const handleDeleteQuestion = (questionId) => {
-    if (!confirm("Bạn có chắc chắn muốn xóa câu hỏi này?")) return;
-
-    setQuestions((prev) => prev.filter((q) => q.id !== questionId));
-    toast({
-      title: "Xóa thành công",
-      description: "Câu hỏi đã được xóa",
-    });
+    deleteQuestionFromQuiz.mutate({ quizId: id, questionId });
   };
 
   const handleCopyLink = () => {
@@ -131,18 +129,20 @@ export default function QuizDetail() {
     }
   };
 
-  // ---------- RENDER ----------
-  if (isLoading) {
-    return <div className="text-center py-8">Đang tải...</div>;
+  function handleOnSuccessClickForQuestionForm(newQuestion) {
+    toggleQuestion.mutate({ quizId: id, newQuestion });
   }
 
-  if (!quiz) {
+  // ---------- RENDER ----------
+
+  if (!getQuizDetail.data || !quiz || !questions) {
     return <div className="text-center py-8">Không tìm thấy bài thi</div>;
   }
 
   return (
     <div className="space-y-6">
       {/* Header */}
+      {getQuizDetail.isLoading && <LoadingOverlay />}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button variant="ghost" onClick={() => navigate("/dashboard")}>
@@ -255,19 +255,32 @@ export default function QuizDetail() {
         <TabsContent value="questions" className="space-y-4">
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-semibold">Danh sách câu hỏi</h2>
-            <Button onClick={() => setShowQuestionForm(true)}>
-              <Plus className="w-4 h-4 mr-2" />
-              Thêm câu hỏi
-            </Button>
+            <div className="flex space-x-2">
+              <Button
+                onClick={() => setShowQuestionForm(true)}
+                className=" bg-red-500 hover:bg-red-500/70"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Thêm câu hỏi thủ công
+              </Button>
+
+              <Button
+                onClick={() => {}}
+                className=" bg-primary hover:bg-primary/70"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Thêm câu hỏi từ ngân hàng
+              </Button>
+            </div>
           </div>
 
           {showQuestionForm && (
             <QuestionForm
               quizId={id}
-              onSuccess={() => {
+              onSuccess={(newQuestion) => {
                 setShowQuestionForm(false);
                 setEditingQuestion(null);
-                loadData();
+                handleOnSuccessClickForQuestionForm(newQuestion);
               }}
               onCancel={() => {
                 setShowQuestionForm(false);
@@ -299,9 +312,9 @@ export default function QuizDetail() {
                     <QuestionForm
                       quizId={id}
                       question={editingQuestion}
-                      onSuccess={() => {
+                      onSuccess={(newQuestion) => {
                         setEditingQuestion(null);
-                        loadData();
+                        handleOnSuccessClickForQuestionForm(newQuestion);
                       }}
                       onCancel={() => {
                         setEditingQuestion(null);
@@ -310,7 +323,7 @@ export default function QuizDetail() {
                   );
                 } else {
                   return (
-                    <Card key={question.id} className="bg-black/5">
+                    <Card className="bg-black/5">
                       <CardHeader className="flex flex-col items-start">
                         <div className="flex items-center space-x-5 mb-5">
                           <div className="w-fit items-stretch">
@@ -352,12 +365,12 @@ export default function QuizDetail() {
 
                       <CardContent>
                         <div className="space-y-2">
-                          {question.options.map(function (option, optIndex) {
+                          {question.answers.map(function (option, optIndex) {
                             return (
                               <div
                                 key={optIndex}
                                 className={`p-3 rounded-lg ${
-                                  optIndex === question.correctOption
+                                  option.isCorrectAnswer
                                     ? "bg-success/10 border-success"
                                     : "bg-white"
                                 }`}
@@ -365,9 +378,9 @@ export default function QuizDetail() {
                                 <span className="font-medium mr-2">
                                   {String.fromCharCode(65 + optIndex)}.
                                 </span>
-                                {option}
+                                {option.content}
 
-                                {optIndex === question.correctOption && (
+                                {option.isCorrectAnswer && (
                                   <Badge className="ml-2 bg-success text-white">
                                     Đáp án đúng
                                   </Badge>

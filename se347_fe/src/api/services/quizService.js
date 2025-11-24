@@ -5,7 +5,7 @@ const quizService = {
   async createQuiz(request) {
     try {
       const response = await axiosClient.post("/api/Quiz", request);
-      return response.data;
+      return response;
     } catch (error) {
       throw StaticClass.createError(error);
     }
@@ -42,6 +42,39 @@ const quizService = {
   async updateQuiz(quizId, newQuiz) {
     try {
       const response = await axiosClient.put(`/api/Quiz/${quizId}`, newQuiz);
+      return response;
+    } catch (error) {
+      throw StaticClass.createError(error);
+    }
+  },
+
+  async getQuizDetailById(id) {
+    try {
+      const response = await axiosClient.get(`/api/Quiz/${id}`);
+      return response;
+    } catch (error) {
+      console.error(error);
+      throw StaticClass.createError(error);
+    }
+  },
+
+  async toggleQuestionInQuiz(quizId, newQuestion) {
+    try {
+      const response = await axiosClient.put(
+        `/api/Quiz/${quizId}/questions`,
+        newQuestion
+      );
+      console.log(response);
+    } catch (error) {
+      throw StaticClass.createError(error);
+    }
+  },
+
+  async removeQuestionFromQuiz(quizId, questionId) {
+    try {
+      const response = await axiosClient.delete(
+        `/api/Quiz/${quizId}/remove-question/${questionId}`
+      );
       return response;
     } catch (error) {
       throw StaticClass.createError(error);

@@ -25,11 +25,13 @@ const quizController = {
       sendResultEmail: sendResultEmail,
       isShuffleQuestions: shuffleQuestions,
       isShuffleAnswers: shuffleAnswers,
-      showCorrectAnswerMode: showCorrectAfterSubmit.id,
+      showCorrectAnswersMode: showCorrectAfterSubmit.id,
     };
 
+    console.error(startTime);
+
     const response = await quizService.createQuiz(request);
-    console.log("Quiz created:", response);
+
     return response;
   },
 
@@ -38,9 +40,9 @@ const quizController = {
     const result = response.map(function (quiz) {
       return {
         ...quiz,
-        createAt: new Date(quiz.createAt).toLocaleString(),
-        dueTime: new Date(quiz.dueTime).toLocaleString(),
-        startTime: new Date(quiz.startTime).toLocaleString(),
+        createAt: quiz.createAt,
+        dueTime: quiz.dueTime,
+        startTime: quiz.startTime,
       };
     });
     return result;
@@ -51,9 +53,9 @@ const quizController = {
 
     return {
       ...response,
-      createAt: new Date(response.createAt).toLocaleString(),
-      dueTime: new Date(response.dueTime).toLocaleString(),
-      startTime: new Date(response.startTime).toLocaleString(),
+      createAt: response.createAt,
+      dueTime: response.dueTime,
+      startTime: response.startTime,
     };
   },
 
@@ -87,9 +89,54 @@ const quizController = {
       sendResultEmail: sendResultEmail,
       isShuffleQuestions: shuffleQuestions,
       isShuffleAnswers: shuffleAnswers,
-      showCorrectAnswerMode: showCorrectAfterSubmit.id,
+      showCorrectAnswersMode: showCorrectAfterSubmit.id,
     };
     const response = await quizService.updateQuiz(quizId, request);
+
+    return response;
+  },
+
+  async getQuizDetailById(id) {
+    const response = await quizService.getQuizDetailById(id);
+
+    const result = {
+      quiz: {
+        id: response.id ?? "0",
+        title: response.title,
+        description: response.description,
+        code: response.accessCode,
+        questionCount: response.questions.length ?? 0,
+        duration: response.durationInMinutes,
+        totalScore: -30,
+        createAt: response.createAt,
+        startTime: response.startTime,
+        endTime: response.dueTime,
+        maxTimeAttempts: response.maxTimesCanAttempt,
+        isPublish: response.isPublish,
+        isShuffleAnswers: response.isShuffleAnswers,
+        isShuffleQuestions: response.isShuffleQuestions,
+      },
+
+      questions: response.questions,
+    };
+
+    return result;
+  },
+
+  async toggleQuestionInQuiz(quizId, newQuestion) {
+    const request = {
+      id: newQuestion.id,
+      content: newQuestion.content,
+      points: newQuestion.score,
+      answers: newQuestion.answers,
+    };
+
+    const response = await quizService.toggleQuestionInQuiz(quizId, request);
+    return response;
+  },
+
+  async removeQuestionFromQuiz(quizId, questionId) {
+    const response = quizService.removeQuestionFromQuiz(quizId, questionId);
     return response;
   },
 };

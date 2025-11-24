@@ -64,7 +64,7 @@ export default function CreateQuiz() {
     function () {
       if (createQuiz.isSuccess) {
         toastHelper.success("Tạo bài thi thành công!");
-        navigate("/dashboard");
+        navigate(`/quizzes/${createQuiz.data.id}/detail`);
       }
 
       if (createQuiz.isError) {
@@ -117,18 +117,16 @@ export default function CreateQuiz() {
           title: getCurrentQuiz.data.title,
           description: getCurrentQuiz.data.description,
           duration: getCurrentQuiz.data.durationInMinutes,
-          startTime: StaticClass.parseForDatePicker(
-            getCurrentQuiz.data.startTime
-          ),
-          endTime: StaticClass.parseForDatePicker(getCurrentQuiz.data.dueTime),
+          startTime: getCurrentQuiz.data.startTime,
+          endTime: getCurrentQuiz.data.dueTime,
           showScoreAfterSubmit: getCurrentQuiz.data.showScoreAfterSubmission,
           sendResultEmail: getCurrentQuiz.data.sendResultEmail,
           shuffleQuestions: getCurrentQuiz.data.isShuffleQuestions,
           shuffleAnswers: getCurrentQuiz.data.isShuffleAnswers,
           showCorrectAfterSubmit:
             showCorrectAnswersMode.asArray().find(function (mode) {
-              return mode.id === getCurrentQuiz.data.showCorrectAnswerMode;
-            }) ?? showCorrectAnswersMode.NEVER,
+              return mode.id === getCurrentQuiz.data.showCorrectAnswersMode;
+            }) ?? showCorrectAnswersMode.IMMEDIATELY,
           maxTimeAttempts: getCurrentQuiz.data.maxTimesCanAttempt,
         });
       }
@@ -150,9 +148,15 @@ export default function CreateQuiz() {
     }
   }
 
+  if (formData) {
+    console.log(formData);
+  }
+
   return (
     <div className="space-y-6">
-      {(createQuiz.isPending || getCurrentQuiz.isLoading) && <LoadingOverlay />}
+      {(createQuiz.isPending ||
+        getCurrentQuiz.isLoading ||
+        updateQuiz.isPending) && <LoadingOverlay />}
       <div className="flex items-center gap-4">
         <Button variant="ghost" onClick={() => navigate("/dashboard")}>
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -290,7 +294,7 @@ export default function CreateQuiz() {
                   id="startTime"
                   name="startTime"
                   type="datetime-local"
-                  value={formData.startTime}
+                  value={StaticClass.convertUtcToLocalInput(formData.startTime)}
                   onChange={(e) =>
                     setFormData((prev) => ({
                       ...prev,
@@ -311,7 +315,7 @@ export default function CreateQuiz() {
                   name="endTime"
                   required
                   type="datetime-local"
-                  value={formData.endTime}
+                  value={StaticClass.convertUtcToLocalInput(formData.endTime)}
                   onChange={(e) =>
                     setFormData((prev) => ({
                       ...prev,
@@ -437,7 +441,7 @@ export default function CreateQuiz() {
                         setFormData(function (p) {
                           return {
                             ...p,
-                            showCorrectAfterSubmit: option,
+                            showCorrectAfterSubmit: option ?? mode,
                           };
                         });
                         setIsOpenDropdownShowCorrectAnswers(false);

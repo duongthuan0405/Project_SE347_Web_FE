@@ -6,78 +6,64 @@ import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioItem } from "@/components/ui/radio-group";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-// Fake services
-const questionService = {
-  create: async (quizId, data) => {
-    console.log("Tạo câu hỏi mới:", quizId, data);
-    return { success: true, data: { id: Math.random() } };
-  },
-  update: async (id, data) => {
-    console.log("Cập nhật câu hỏi:", id, data);
-    return { success: true };
-  },
-};
-
-// Fake toast
-const toast = ({ title, description, variant }) => {
-  console.log("TOAST", { title, description, variant });
-};
-
 export function QuestionForm({
-  quizId = "quiz-123",
   question = null,
   onSuccess = () => {},
   onCancel = () => {},
 }) {
   const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    content: "",
-    options: ["", "", "", ""],
-    correctOption: 0,
-    score: 1,
-  });
 
-  useEffect(() => {
-    if (question) {
-      setFormData({
-        content: question.content,
-        options: question.options,
-        correctOption: question.correctOption,
-        score: question.score,
-      });
-    }
-  }, [question]);
+  const [formData, setFormData] = useState(null);
+
+  useEffect(
+    function () {
+      if (!question) {
+        setFormData({
+          id: null,
+          content: "",
+
+          answers: Array(4)
+            .fill(null)
+            .map(function (item, index) {
+              return { id: null, content: "", isCorrectAnswer: index === 0 };
+            }),
+
+          score: 1,
+        });
+      } else {
+        setFormData({
+          id: question.id,
+          content: question.content,
+          answers: question.answers, // {id, content, isCorrectAnswer}
+          score: question.score,
+        });
+      }
+    },
+    [question]
+  );
 
   const handleOptionChange = (index, value) => {
-    const newOptions = [...formData.options];
-    newOptions[index] = value;
-    setFormData((prev) => ({ ...prev, options: newOptions }));
+    let newOptions = [...formData.answers];
+    newOptions = newOptions.map(function (option, i) {
+      if (index === i) {
+        return {
+          ...option,
+          content: value,
+        };
+      } else return option;
+    });
+    setFormData((prev) => ({ ...prev, answers: newOptions }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-
-    const result = question
-      ? await questionService.update(question.id, formData)
-      : await questionService.create(quizId, formData);
-
-    if (result.success) {
-      toast({
-        title: question ? "Cập nhật thành công" : "Thêm câu hỏi thành công",
-        description: "Câu hỏi đã được lưu",
-      });
-      onSuccess?.(formData);
-    } else {
-      toast({
-        title: "Lỗi",
-        description: "Không thể lưu câu hỏi",
-        variant: "destructive",
-      });
-    }
-
-    setIsLoading(false);
+    onSuccess?.(formData);
   };
+
+  if (!formData) {
+    return <></>;
+  }
 
   return (
     <Card className="bg-black/5">
@@ -92,7 +78,7 @@ export function QuestionForm({
             <Label>Nội dung câu hỏi *</Label>
             <Textarea
               id="content"
-              value={formData.content}
+              value={formData?.content ?? ""}
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, content: e.target.value }))
               }
@@ -105,22 +91,31 @@ export function QuestionForm({
           <div className="flex flex-col space-y-2">
             <Label>Các đáp án *</Label>
             <RadioGroup
-              name="f"
+              name={formData.id ?? "new_question"}
               className="w-[600px] flex flex-col space-y-5"
-              currentSelectedValue={formData.correctOption}
+              currentSelectedValue={Math.max(
+                0,
+                formData.answers?.findIndex((answer) => answer.isCorrectAnswer)
+              )}
               onChange={function (value) {
                 setFormData(function (p) {
                   return {
                     ...p,
-                    correctOption: Number(value),
+                    answers: p.answers.map(function (ans, index) {
+                      if (index === Number(value)) {
+                        return { ...ans, isCorrectAnswer: true };
+                      } else {
+                        return { ...ans, isCorrectAnswer: false };
+                      }
+                    }),
                   };
                 });
               }}
             >
-              {formData.options.map((option, index) => (
-                <RadioItem value={index} className="w-full">
+              {formData.answers?.map((option, index) => (
+                <RadioItem key={index} value={index} className="w-full">
                   <Input
-                    value={option}
+                    value={option.content}
                     onChange={(e) => handleOptionChange(index, e.target.value)}
                     required
                     className="flex-1 focus:outline-none focus:ring-accent-foreground focus:ring-2 bg-white w-full"

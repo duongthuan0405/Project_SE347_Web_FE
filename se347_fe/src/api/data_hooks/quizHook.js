@@ -96,3 +96,30 @@ export function updateQuizById() {
     },
   });
 }
+
+export function useGetQuizDetailById(id) {
+  return useQuery({
+    queryKey: ["quiz-detail", id],
+    queryFn: function (context) {
+      return quizController.getQuizDetailById(context.queryKey[1]);
+    },
+    refetchOnWindowFocus: false,
+    enabled: id && id != "",
+  });
+}
+
+export function useToggleQuestionInQuiz() {
+  return useMutation({
+    mutationFn: function ({ quizId, newQuestion }) {
+      return quizController.toggleQuestionInQuiz(quizId, newQuestion);
+    },
+  });
+}
+
+export function useRemoveQuestionFromQuiz() {
+  return useMutation({
+    mutationFn: function ({ quizId, questionId }) {
+      return quizController.removeQuestionFromQuiz(quizId, questionId);
+    },
+  });
+}

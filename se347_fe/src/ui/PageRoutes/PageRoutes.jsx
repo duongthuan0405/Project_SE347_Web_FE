@@ -40,7 +40,7 @@ export default function PageRoutes() {
         <Route path="/quizzes" element={<Navigate to="/dashboard" replace />} />
         <Route path="/ai-generate" element={<AIGenerate />} />
         <Route path="/quizzes/:id/edit" element={<CreateQuiz />} />
-        <Route path="/quizzes/:id" element={<QuizDetail />} />
+        <Route path="/quizzes/:id/detail" element={<QuizDetail />} />
         <Route path="/reports/:id" element={<Reports />} />
         <Route path="/take-quiz" element={<TakeQuizEntry />} />
         <Route path="/take/:id" element={<TakeQuiz />} />

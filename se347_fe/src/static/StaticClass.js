@@ -15,16 +15,19 @@ const StaticClass = {
     return regex.test(email);
   },
 
-  parseForDatePicker: function (date) {
-    const [timePart, datePart] = date.split(" "); // ["00:00:00", "30/11/2025"]
-    const [hours, minutes] = timePart.split(":");
-    const [day, month, year] = datePart.split("/");
+  convertUtcToLocalInput(isoString) {
+    if (!isoString) return "";
 
-    // format chuẩn datetime-local
-    return `${year}-${month.padStart(2, "0")}-${day.padStart(
-      2,
-      "0"
-    )}T${hours.padStart(2, "0")}:${minutes.padStart(2, "0")}`;
+    const date = new Date(isoString);
+
+    // Nếu date invalid → return empty để tránh crash
+    if (isNaN(date.getTime())) return "";
+
+    // Chuyển từ UTC sang Local bằng cách trừ timezone offset
+    date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+
+    // format "YYYY-MM-DDTHH:mm"
+    return date.toISOString().slice(0, 16);
   },
 };
 
