@@ -9,14 +9,19 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { AvatarImage } from "@/components/ui/avatar";
-import { useState } from "react";
-
+import { useContext, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { AppContext } from "@/App";
+import tokenHelper from "@/helper/tokenHelper";
+import { useLogOut } from "@/api/data_hooks/authHook";
 export function Header() {
+  // open dropdown menu
   const [isOpen, setIsOpen] = useState();
+  // context
+  const appContext = useContext(AppContext);
 
-  function openDropDown() {
-    setIsOpen(true);
-  }
+  //logOut hook
+  const logOut = useLogOut();
 
   const optionsMenu = {
     PROFILE: {
@@ -36,52 +41,88 @@ export function Header() {
     },
   };
 
+  // handle on select option menu
+  function handleOnSelectOptionMenu(item) {
+    if (item.id === optionsMenu.LOGOUT.id) {
+      // logout
+      logOut.mutate();
+      appContext.setIsLogin(false);
+      navigate("/login");
+    } else if (item.id === optionsMenu.PROFILE.id) {
+      console.log(item);
+    }
+  }
+
+  // navigate
+  const navigate = useNavigate();
+  function openDropDown() {
+    setIsOpen(true);
+  }
+
   return (
     <header className="bg-card shadow-xl h-16 aspect-square flex items-center justify-between px-6 py-2">
       <div>
-        <h1 className="text-xl font-Poppins font-bold h-fit mb-4 bg-linear-to-r from-primary to-primary-hover bg-clip-text text-transparent text-bla">
+        <div
+          onClick={() => navigate("/")}
+          className="text-3xl font-Poppins font-bold h-fit  bg-linear-to-r from-primary to-primary-hover bg-clip-text text-transparent text-bla hover:cursor-pointer select-none"
+        >
           MyQuizz
-        </h1>
+        </div>
       </div>
-      <DropdownMenu className="h-full">
-        <DropdownMenuTrigger
-          onClick={function (e) {
-            openDropDown();
-          }}
-        >
-          <AvatarImage
-            className="h-15 aspect-square"
-            src="https://scontent.fhan4-6.fna.fbcdn.net/v/t39.30808-6/584165360_841893141897615_6758666652772022466_n.jpg?stp=cp6_dst-jpg_p526x296_tt6&_nc_cat=109&ccb=1-7&_nc_sid=833d8c&_nc_eui2=AeH9zo52Ho1npzS-JIx1ykf2ei0O7Xaf5sR6LQ7tdp_mxIJ2jlbhzpSTw-7n3rfTX-aBMPWO1fsZYoxLb7fgHZNW&_nc_ohc=G1BYvaMvWfoQ7kNvwGzCxdl&_nc_oc=AdnfmQwYS52tzvqtsEW34hiL_e-gh-E9ZEY1yu6tld8HytkbXN3W1-LHny3nGkLYZNE&_nc_zt=23&_nc_ht=scontent.fhan4-6.fna&_nc_gid=yE0t5GTtnaPvnnglvux7rQ&oh=00_AfgJShrcPvKiFvDB01cMD-mFTxhV0aTKl_w93-yRih-sRA&oe=69265DD6"
-          />
-        </DropdownMenuTrigger>
 
-        <DropdownMenuContent
-          align="end"
-          className="w-56 right-2"
-          open={isOpen}
-          setOpen={setIsOpen}
+      {appContext.currentUserProfile && (
+        <DropdownMenu className="h-full">
+          <DropdownMenuTrigger
+            onClick={function (e) {
+              openDropDown();
+            }}
+          >
+            <AvatarImage
+              className="h-14 aspect-square"
+              src={appContext.currentUserProfile.avatar}
+              alt={appContext.currentUserProfile.firstName}
+            />
+          </DropdownMenuTrigger>
+
+          <DropdownMenuContent
+            align="end"
+            className="w-56 right-2"
+            open={isOpen}
+            setOpen={setIsOpen}
+          >
+            <DropdownMenuLabel>Tài khoản của tôi</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {optionsMenu.asArray().map(function (item, index) {
+              return (
+                <DropdownMenuItem
+                  key={item.id}
+                  item={item}
+                  onSelect={function (selectedItem) {
+                    if (selectedItem === null) {
+                      selectedItem = item;
+                    }
+                    handleOnSelectOptionMenu(selectedItem);
+                  }}
+                >
+                  {<item.icon className="w-4 h-4 me-2" />}
+                  {item.name}
+                </DropdownMenuItem>
+              );
+            })}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
+
+      {appContext.currentUserProfile == null && (
+        <Button
+          size="lg"
+          variant="outline"
+          onClick={() => navigate("/login")}
+          className="text-sm px-5 py-5 bg-accent-foreground text-white hover:bg-accent-foreground/70"
         >
-          <DropdownMenuLabel>Tài khoản của tôi</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          {optionsMenu.asArray().map(function (item, index) {
-            return (
-              <DropdownMenuItem
-                key={item.id}
-                item={item}
-                onSelect={function (selectedItem) {
-                  if (selectedItem === null) {
-                    selectedItem = item;
-                  }
-                  console.log(selectedItem);
-                }}
-              >
-                {<item.icon className="w-4 h-4 me-2" />}
-                {item.name}
-              </DropdownMenuItem>
-            );
-          })}
-        </DropdownMenuContent>
-      </DropdownMenu>
+          Đăng nhập
+        </Button>
+      )}
     </header>
   );
 }

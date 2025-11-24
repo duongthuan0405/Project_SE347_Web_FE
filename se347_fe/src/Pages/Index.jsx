@@ -19,37 +19,10 @@ export default function Index() {
               <Button
                 size="lg"
                 variant="outline"
-                onClick={() => navigate("/register")}
-                className="min-w-[200px]"
-              >
-                Bắt đầu ngay
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                onClick={() => navigate("/login")}
-                className="min-w-[200px]"
-              >
-                Đăng nhập
-              </Button>
-            </div>
-
-            <div className="flex gap-4 justify-center mt-4">
-              <Button
-                size="lg"
-                variant="outline"
                 onClick={() => navigate("/take-quiz")}
-                className="min-w-[200px]"
+                className="text-xl px-10 py-5 bg-accent-foreground text-white hover:bg-accent-foreground/70"
               >
                 Tham gia bài thi
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                onClick={() => navigate("/history")}
-                className="min-w-[200px]"
-              >
-                Tra cứu kết quả
               </Button>
             </div>
           </div>
@@ -88,7 +61,7 @@ export default function Index() {
             </div>
           </div>
 
-          <div className="bg-card p-12 rounded-xl shadow-sm text-center hover:cursor-pointer hover:scale-105 transition-all duration-200 ease-linear">
+          <div className="bg-card p-12 rounded-xl shadow-sm text-center hover:cursor-pointer">
             <h2 className="text-3xl font-bold mb-4">Sẵn sàng bắt đầu?</h2>
             <p className="text-muted-foreground mb-6">
               Tạo tài khoản miễn phí và trải nghiệm hệ thống hiện đại.

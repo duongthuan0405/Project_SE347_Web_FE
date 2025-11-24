@@ -31,4 +31,12 @@ const Alert = ({
   );
 };
 
-export default Alert;
+const AlertDescription = ({ children, className, ...props }) => {
+  return (
+    <div className={cn("text-sm text-muted-foreground", className)} {...props}>
+      {children}
+    </div>
+  );
+};
+
+export { Alert, AlertDescription };

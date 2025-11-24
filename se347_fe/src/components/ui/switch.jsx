@@ -1,11 +1,19 @@
-import React, { useState } from "react";
+import React, { use, useEffect, useState } from "react";
 
 export function Switch({ checked: checkedProp, onChange }) {
-  const [checked, setChecked] = useState(!!checkedProp);
+  const [checked, setChecked] = useState();
+
+  useEffect(
+    function () {
+      setChecked(!!checkedProp);
+    },
+    [checkedProp]
+  );
 
   function handleClick() {
+    const prev = checked;
     setChecked((prev) => !prev);
-    if (onChange) onChange(newValue);
+    onChange(!prev);
   }
 
   return (
