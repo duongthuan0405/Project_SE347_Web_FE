@@ -1,7 +1,7 @@
 import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard,
-  FileText,
+  FileQuestionMark,
   Sparkles,
   BarChart3,
   User,
@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 
 const navItems = [
   { to: "/dashboard", icon: LayoutDashboard, label: "Bảng điều khiển" },
-  { to: "/quizzes", icon: FileText, label: "Bài thi" },
+  { to: "/question-bank", icon: FileQuestionMark, label: "Ngân hàng câu hỏi" },
   { to: "/ai-generate", icon: Sparkles, label: "Tạo câu hỏi AI" },
   { to: "/participants", icon: Users, label: "Học viên" },
   { to: "/reports", icon: BarChart3, label: "Thống kê" },

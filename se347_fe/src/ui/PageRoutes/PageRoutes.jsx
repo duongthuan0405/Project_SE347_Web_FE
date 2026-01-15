@@ -17,6 +17,7 @@ import TakeQuiz from "@/Pages/TakeQuiz";
 import QuizCompleted from "@/Pages/QuizCompleted";
 import Invite from "@/Pages/Invite";
 import VerifyOTP from "@/Pages/VerifyOTP";
+import QuestionBank from "@/Pages/QuestionBank";
 
 export default function PageRoutes() {
   return (
@@ -37,7 +38,7 @@ export default function PageRoutes() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/history" element={<History />} />
         <Route path="/participants" element={<Participants />} />
-        <Route path="/quizzes" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/question-bank" element={<QuestionBank />} />
         <Route path="/ai-generate" element={<AIGenerate />} />
         <Route path="/quizzes/:id/edit" element={<CreateQuiz />} />
         <Route path="/quizzes/:id/detail" element={<QuizDetail />} />

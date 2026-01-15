@@ -73,7 +73,10 @@ export default function Dashboard() {
           </p>
         </div>
         {user && (
-          <Button onClick={() => navigate("/quizzes/create")}>
+          <Button
+            onClick={() => navigate("/quizzes/create")}
+            className="bg-primary hover:bg-primary/70"
+          >
             <Plus className="w-4 h-4 mr-2" />
             Tạo bài thi mới
           </Button>

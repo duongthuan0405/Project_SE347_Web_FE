@@ -31,10 +31,13 @@ import {
 } from "@/api/data_hooks/quizHook";
 import LoadingOverlay from "@/ui/LoadingOverlay";
 import toastHelper from "@/helper/toastHelper";
+import QuestionBankModal from "@/components/project_components/questionBankModel";
 
 export default function QuizDetail() {
   // get param from route
   const { id } = useParams();
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // state hook
   const [quiz, setQuiz] = useState(null);
@@ -141,6 +144,12 @@ export default function QuizDetail() {
 
   return (
     <div className="space-y-6">
+      <QuestionBankModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        currentQuizId={id}
+      />
+
       {/* Header */}
       {getQuizDetail.isLoading && <LoadingOverlay />}
       <div className="flex items-center justify-between">
@@ -265,7 +274,9 @@ export default function QuizDetail() {
               </Button>
 
               <Button
-                onClick={() => {}}
+                onClick={() => {
+                  setIsModalOpen(true);
+                }}
                 className=" bg-primary hover:bg-primary/70"
               >
                 <Plus className="w-4 h-4 mr-2" />
