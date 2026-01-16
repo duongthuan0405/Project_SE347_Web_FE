@@ -22,6 +22,15 @@ const questionBankService = {
       throw StaticClass.createError(error);
     }
   },
+
+  async createManyQuestions(questions) {
+    try {
+      const response = await axiosClient.post(`/api/QuestionBank`, questions);
+      return response;
+    } catch (error) {
+      throw StaticClass.createError(error);
+    }
+  },
 };
 
 export default questionBankService;

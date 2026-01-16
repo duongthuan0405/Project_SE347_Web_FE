@@ -10,6 +10,7 @@ export function QuestionForm({
   question = null,
   onSuccess = () => {},
   onCancel = () => {},
+  isShowButtons = true,
 }) {
   const [isLoading, setIsLoading] = useState(false);
 

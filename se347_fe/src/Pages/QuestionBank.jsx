@@ -2,6 +2,7 @@ import {
   useDeleteQuestionFromBank,
   useGetMyQuestionBank,
 } from "@/api/data_hooks/questionBankHook";
+import { QuestionFormDialog } from "@/components/project_components/questionFormDialog";
 import { Button } from "@/components/ui/button";
 
 import {
@@ -34,6 +35,7 @@ function QuestionBank() {
   });
 
   const [searchParamsTrigger, setSearchParamsTrigger] = useState(searchParams);
+  const [showQuestionForm, setShowQuestionForm] = useState(false);
 
   function handleOnChangeSearchParams(e) {
     setSearchParams(function (p) {
@@ -85,6 +87,14 @@ function QuestionBank() {
 
   return (
     <div className="space-y-6">
+      <QuestionFormDialog
+        isOpen={showQuestionForm}
+        onClose={() => {
+          setShowQuestionForm(false);
+        }}
+        editingQuestion={""}
+      />
+
       {getQuestionBank.isLoading && <LoadingOverlay />}
       <div className="flex items-center justify-between">
         <div>
@@ -98,17 +108,10 @@ function QuestionBank() {
           <div className="flex space-x-2.5">
             <Button
               className="bg-primary hover:bg-primary/70"
-              onClick={() => navigate("/quizzes/create")}
+              onClick={() => setShowQuestionForm(true)}
             >
               <Plus className="w-4 h-4 mr-2" />
               Thêm câu hỏi mới
-            </Button>
-            <Button
-              className="bg-red-500 hover:bg-red-500/70"
-              onClick={() => navigate("/quizzes/create")}
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Thêm danh mục mới
             </Button>
           </div>
         )}
