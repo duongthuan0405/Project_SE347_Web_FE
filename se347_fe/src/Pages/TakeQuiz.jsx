@@ -30,6 +30,7 @@ export default function TakeQuiz() {
     email: "",
   });
   const [answers, setAnswers] = useState({});
+  const { id } = useParams();
 
   useEffect(() => {
     // Fake quiz

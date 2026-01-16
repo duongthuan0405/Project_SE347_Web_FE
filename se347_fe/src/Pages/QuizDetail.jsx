@@ -33,6 +33,16 @@ import LoadingOverlay from "@/ui/LoadingOverlay";
 import toastHelper from "@/helper/toastHelper";
 import QuestionBankModal from "@/components/project_components/questionBankModel";
 
+import { Send, FileUp, Loader2 } from "lucide-react";
+import {
+  Dialog,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import participateService from "@/api/services/participateService";
+
 export default function QuizDetail() {
   // get param from route
   const { id } = useParams();
@@ -102,7 +112,7 @@ export default function QuizDetail() {
   };
 
   const handleCopyLink = () => {
-    const link = `${window.location.origin}/take/${quiz?.code || id}`;
+    const link = `${window.location.origin}/take/${id}`;
     navigator.clipboard.writeText(link);
     toast({
       title: "Đã sao chép",
@@ -136,6 +146,31 @@ export default function QuizDetail() {
     toggleQuestion.mutate({ quizId: id, newQuestion });
   }
 
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [isSending, setIsSending] = useState(false);
+
+  // Handler xử lý gửi file
+  const handleSendInvite = async () => {
+    if (!selectedFile) {
+      toastHelper.error("Vui lòng chọn file excel trước!");
+      return;
+    }
+
+    setIsSending(true);
+    try {
+      await participateService.sendInvitesByFile(id, selectedFile);
+
+      toastHelper.success("Lời mời đã được gửi thành công!");
+      setIsInviteModalOpen(false);
+      setSelectedFile(null);
+    } catch (error) {
+      toastHelper.error(error.message || "Có lỗi xảy ra khi gửi lời mời.");
+    } finally {
+      setIsSending(false);
+    }
+  };
+
   // ---------- RENDER ----------
 
   if (!getQuizDetail.data || !quiz || !questions) {
@@ -149,6 +184,65 @@ export default function QuizDetail() {
         onClose={() => setIsModalOpen(false)}
         currentQuizId={id}
       />
+
+      <Dialog
+        isOpen={isInviteModalOpen}
+        onClose={() => !isSending && setIsInviteModalOpen(false)}
+      >
+        <DialogHeader>
+          <DialogTitle>Gửi lời mời qua danh sách</DialogTitle>
+          <DialogDescription>
+            Vui lòng tải lên file Excel (.xlsx, .xls) chứa danh sách email hoặc
+            số điện thoại người nhận.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="grid gap-4 py-4">
+          <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-lg p-6 hover:bg-gray-50 transition-colors">
+            <input
+              type="file"
+              id="excel-upload"
+              className="hidden"
+              accept=".xlsx, .xls"
+              onChange={(e) => setSelectedFile(e.target.files[0])}
+              disabled={isSending}
+            />
+            <label
+              htmlFor="excel-upload"
+              className="flex flex-col items-center cursor-pointer"
+            >
+              <FileUp className="w-10 h-10 text-gray-400 mb-2" />
+              <span className="text-sm font-medium">
+                {selectedFile ? selectedFile.name : "Nhấn để chọn file Excel"}
+              </span>
+            </label>
+          </div>
+        </div>
+
+        <DialogFooter>
+          <Button
+            variant="outline"
+            onClick={() => setIsInviteModalOpen(false)}
+            disabled={isSending}
+          >
+            Hủy
+          </Button>
+          <Button
+            onClick={handleSendInvite}
+            disabled={isSending || !selectedFile}
+            className="min-w-[120px]"
+          >
+            {isSending ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Đang gửi...
+              </>
+            ) : (
+              "Gửi lời mời"
+            )}
+          </Button>
+        </DialogFooter>
+      </Dialog>
 
       {/* Header */}
       {getQuizDetail.isLoading && <LoadingOverlay />}
@@ -206,7 +300,7 @@ export default function QuizDetail() {
             <Label className="text-sm font-medium">Đường link tham gia</Label>
             <div className="flex gap-2">
               <Input
-                value={`${window.location.origin}/take/${quiz.code || id}`}
+                value={`${window.location.origin}/take/${id}`}
                 readOnly
                 className="text-sm"
               />
@@ -219,6 +313,17 @@ export default function QuizDetail() {
                 Sao chép
               </Button>
             </div>
+          </div>
+
+          <div className="mt-2 w-full flex justify-end">
+            <Button
+              variant="secondary"
+              onClick={() => setIsInviteModalOpen(true)}
+              className="w-fit bg-green-400 hover:bg-green-200 px-6"
+            >
+              <Send className="w-4 h-4 mr-2" />
+              Gửi lời mời tham gia
+            </Button>
           </div>
         </CardContent>
       </Card>
