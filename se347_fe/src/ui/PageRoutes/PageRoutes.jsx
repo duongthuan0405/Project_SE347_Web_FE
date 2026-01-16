@@ -13,11 +13,14 @@ import EditQuiz from "@/Pages/EditQuiz";
 import QuizDetail from "@/Pages/QuizDetail";
 import Reports from "@/Pages/Reports";
 import TakeQuizEntry from "@/Pages/TakeQuizEntry";
-import TakeQuiz from "@/Pages/TakeQuiz";
 import QuizCompleted from "@/Pages/QuizCompleted";
 import Invite from "@/Pages/Invite";
 import VerifyOTP from "@/Pages/VerifyOTP";
 import QuestionBank from "@/Pages/QuestionBank";
+import QuizInfo from "@/Pages/QuizInfo";
+import QuizInputInfo from "@/Pages/QuizInputInfo";
+import QuizAction from "@/Pages/QuizAction";
+import ParticipationReport from "@/Pages/ParticipationReport";
 
 export default function PageRoutes() {
   return (
@@ -44,10 +47,16 @@ export default function PageRoutes() {
         <Route path="/quizzes/:id/detail" element={<QuizDetail />} />
         <Route path="/reports/:id" element={<Reports />} />
         <Route path="/take-quiz" element={<TakeQuizEntry />} />
-        <Route path="/take/:id" element={<TakeQuiz />} />
+        <Route path="/take/:id" element={<QuizInfo />} />
+        <Route path="/take/:id/input-info" element={<QuizInputInfo />} />
+        <Route path="/take/:id/:participation_id" element={<QuizAction />} />
         <Route path="/quiz-completed" element={<QuizCompleted />} />
         <Route path="/invite" element={<Invite />} />
         <Route path="/verify-otp" element={<VerifyOTP />} />
+        <Route
+          path="/report/detail-participation/:participation_id"
+          element={<ParticipationReport />}
+        />
       </Route>
     </Routes>
   );

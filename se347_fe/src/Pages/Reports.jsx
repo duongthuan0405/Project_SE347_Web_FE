@@ -19,6 +19,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import statisticsService from "@/api/services/statisticsService";
+import toastHelper from "@/helper/toastHelper";
 
 // Mock services
 
@@ -46,46 +48,36 @@ export default function Reports() {
   //   };
 
   useEffect(() => {
-    // Fake quiz data
-    setQuiz({
-      id: "quiz-123",
-      title: "Bài kiểm tra Toán lớp 10",
-      totalScore: 100,
-    });
+    const fetch = async function () {
+      const p = statisticsService.getParticipations(id);
+      const q = statisticsService.getQuizStatistics(id);
+      const pars = await p;
+      const quiz = await q;
 
-    // Fake attempts
-    setAttempts([
-      {
-        id: 1,
-        participant: {
-          name: "Nguyễn Văn A",
-          studentId: "HS001",
-          email: "a@gmail.com",
-        },
-        score: 85,
-        submittedAt: "2025-11-22T08:30:00Z",
-      },
-      {
-        id: 2,
-        participant: {
-          name: "Trần Thị B",
-          studentId: "HS002",
-          email: "b@gmail.com",
-        },
-        score: 92,
-        submittedAt: "2025-11-22T09:15:00Z",
-      },
-      {
-        id: 3,
-        participant: {
-          name: "Lê Văn C",
-          studentId: "HS003",
-          email: "c@gmail.com",
-        },
-        score: 76,
-        submittedAt: "2025-11-22T10:05:00Z",
-      },
-    ]);
+      setQuiz({
+        id: quiz.quizId,
+        title: quiz.title,
+        totalScore: 10,
+      });
+
+      setAttempts(
+        pars.map(function (par) {
+          return {
+            id: par.participationId,
+            participant: {
+              name: par.fullName,
+              studentId: par.studentId,
+              className: par.className,
+              email: par.email ?? "no",
+            },
+            score: par.score,
+            submittedAt: par.submitTime,
+          };
+        })
+      );
+    };
+
+    fetch();
   }, []);
 
   const calculateStats = () => {
@@ -101,11 +93,13 @@ export default function Reports() {
     };
   };
 
-  const handleExport = (type) => {
-    toast({
-      title: "Đang xuất file",
-      description: `File ${type.toUpperCase()} đang được tạo...`,
-    });
+  const handleExport = async () => {
+    try {
+      const res = await statisticsService.exportToExcel(id);
+      console.log(res);
+    } catch (error) {
+      toastHelper.error(error.message);
+    }
   };
 
   const formatDate = (dateString) => {
@@ -133,21 +127,20 @@ export default function Reports() {
           </Button>
           <div>
             <h1 className="text-3xl font-bold">Thống kê bài thi</h1>
-            <p className="text-muted-foreground mt-1">{quiz.title}</p>
           </div>
         </div>
 
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => handleExport("excel")}>
+          <Button variant="outline" onClick={() => handleExport()}>
             <Download className="w-4 h-4 mr-2" />
             Xuất Excel
           </Button>
-          <Button variant="outline" onClick={() => handleExport("pdf")}>
-            <Download className="w-4 h-4 mr-2" />
-            Xuất PDF
-          </Button>
         </div>
       </div>
+
+      <p className="text-black-foreground mt-1 text-4xl font-bold">
+        {quiz.title}
+      </p>
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -205,43 +198,54 @@ export default function Reports() {
               Chưa có ai hoàn thành bài thi
             </p>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Họ tên</TableHead>
-                  <TableHead>Mã học sinh</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Điểm</TableHead>
-                  <TableHead>Thời gian nộp</TableHead>
-                </TableRow>
-              </TableHeader>
-
-              <TableBody>
-                {attempts.map((attempt) => (
-                  <TableRow key={attempt.id}>
-                    <TableCell className="font-medium">
-                      {attempt.participant.name}
-                    </TableCell>
-
-                    <TableCell>{attempt.participant.studentId}</TableCell>
-                    <TableCell>{attempt.participant.email}</TableCell>
-
-                    <TableCell>
-                      <span className="font-semibold text-primary">
-                        {attempt.score}
-                      </span>
-                      <span className="text-muted-foreground">
-                        /{quiz.totalScore}
-                      </span>
-                    </TableCell>
-
-                    <TableCell>
-                      {attempt.submittedAt && formatDate(attempt.submittedAt)}
-                    </TableCell>
+            <div className="rounded-xl overflow-hidden">
+              <Table className="border-collapse border-spacing-y-2">
+                <TableHeader className="bg-accent-foreground">
+                  <TableRow className="border-b-4 border-white">
+                    <TableHead className="text-white">Họ tên</TableHead>
+                    <TableHead className="text-white">Mã học sinh</TableHead>
+                    <TableHead className="text-white">Email</TableHead>
+                    <TableHead className="text-white">Điểm</TableHead>
+                    <TableHead className="text-white">Thời gian nộp</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+
+                <TableBody>
+                  {attempts.map((attempt) => (
+                    <TableRow
+                      key={attempt.id}
+                      onClick={() => {
+                        navigate(`/report/detail-participation/${attempt.id}`);
+                      }}
+                      className="border-b-4 border-white bg-black/10 hover:bg-black/5"
+                    >
+                      <TableCell className="font-medium max-w-[220px] overflow-hidden whitespace-nowrap text-ellipsis">
+                        {attempt.participant.name}
+                      </TableCell>
+
+                      <TableCell>{attempt.participant.studentId}</TableCell>
+
+                      <TableCell className="max-w-[250px] overflow-hidden whitespace-nowrap text-ellipsis">
+                        {attempt.participant.email}
+                      </TableCell>
+
+                      <TableCell>
+                        <span className="font-semibold text-primary">
+                          {attempt.score}
+                        </span>
+                        <span className="text-muted-foreground">
+                          /{quiz.totalScore}
+                        </span>
+                      </TableCell>
+
+                      <TableCell>
+                        {attempt.submittedAt && formatDate(attempt.submittedAt)}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           )}
         </CardContent>
       </Card>

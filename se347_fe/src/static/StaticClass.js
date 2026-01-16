@@ -3,6 +3,7 @@ const StaticClass = {
     const newErr = new Error(
       error.data?.error ||
         error.data?.message ||
+        error.data?.errors?.join("\n") ||
         `FE Error! Detail is that ${error.message}`
     );
     newErr.status = error.status || -1;

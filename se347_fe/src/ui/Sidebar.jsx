@@ -14,7 +14,7 @@ const navItems = [
   { to: "/question-bank", icon: FileQuestionMark, label: "Ngân hàng câu hỏi" },
   { to: "/ai-generate", icon: Sparkles, label: "Tạo câu hỏi AI" },
   // { to: "/participants", icon: Users, label: "Học viên" },
-  { to: "/reports", icon: BarChart3, label: "Thống kê" },
+  // { to: "/reports", icon: BarChart3, label: "Thống kê" },
   { to: "/profile", icon: User, label: "Hồ sơ" },
 ];
 
