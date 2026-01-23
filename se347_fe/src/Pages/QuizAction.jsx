@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import publicQuizService from "@/api/services/publicQuizService";
 import toastHelper from "@/helper/toastHelper";
 import LoadingOverlay from "@/ui/LoadingOverlay";
+import QuizResultDialog from "@/components/project_components/quizResultDialog";
 
 export default function QuizAction() {
   const { id, participation_id } = useParams();
@@ -23,6 +24,8 @@ export default function QuizAction() {
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isQuizResultOpen, setIsQuizResultOpen] = useState(false);
+  const [submitResult, setSubmitResult] = useState(null);
 
   useEffect(() => {
     // Fake questions
@@ -63,9 +66,11 @@ export default function QuizAction() {
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
-      await publicQuizService.submit(participation_id);
+      const res = await publicQuizService.submit(participation_id);
       toastHelper.success("Nộp bài thành công");
-      navigate("/");
+
+      setSubmitResult(res);
+      setIsQuizResultOpen(true);
     } catch (error) {
       toastHelper.error(error.message);
     } finally {
@@ -142,6 +147,13 @@ export default function QuizAction() {
           </Card>
         ))}
       </div>
+
+      <QuizResultDialog
+        isOpen={isQuizResultOpen}
+        onClose={() => setIsQuizResultOpen(false)}
+        result={submitResult}
+        onBackHome={() => navigate("/")}
+      />
     </div>
   );
 }

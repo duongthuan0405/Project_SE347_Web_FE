@@ -6,6 +6,7 @@ import {
   BarChart3,
   User,
   Users,
+  History,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useContext } from "react";
@@ -17,6 +18,7 @@ const navItems = [
   { to: "/ai-generate", icon: Sparkles, label: "Tạo câu hỏi AI" },
   // { to: "/participants", icon: Users, label: "Học viên" },
   // { to: "/reports", icon: BarChart3, label: "Thống kê" },
+
   { to: "/profile", icon: User, label: "Hồ sơ" },
 ];
 

@@ -62,7 +62,7 @@ const quizService = {
     try {
       const response = await axiosClient.put(
         `/api/Quiz/${quizId}/questions`,
-        newQuestion
+        newQuestion,
       );
       console.log(response);
     } catch (error) {
@@ -73,7 +73,18 @@ const quizService = {
   async removeQuestionFromQuiz(quizId, questionId) {
     try {
       const response = await axiosClient.delete(
-        `/api/Quiz/${quizId}/remove-question/${questionId}`
+        `/api/Quiz/${quizId}/remove-question/${questionId}`,
+      );
+      return response;
+    } catch (error) {
+      throw StaticClass.createError(error);
+    }
+  },
+
+  resetAccessCode: async function (id) {
+    try {
+      const response = await axiosClient.put(
+        `/api/Quiz/${id}/reset-access-code`,
       );
       return response;
     } catch (error) {

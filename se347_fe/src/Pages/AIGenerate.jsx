@@ -10,9 +10,11 @@ import {
 } from "@/components/ui/card";
 import aiQuizService from "@/api/services/aiQuizService";
 import toastHelper from "@/helper/toastHelper";
+import { useNavigate } from "react-router-dom";
 
 export default function AIGenerate() {
   const [isGenerating, setIsGenerating] = useState(false);
+  const navigate = useNavigate();
 
   // Quản lý thông tin nhập liệu
   const [formData, setFormData] = useState({
@@ -54,6 +56,7 @@ export default function AIGenerate() {
         additionalInstructions: formData.additionalInstructions,
       });
       toastHelper.success("AI tạo câu hỏi thành công");
+      navigate("/question-bank");
     } catch (error) {
       toastHelper.error(error.message);
     } finally {

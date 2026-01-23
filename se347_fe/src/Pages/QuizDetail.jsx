@@ -42,6 +42,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import participateService from "@/api/services/participateService";
+import quizService from "@/api/services/quizService";
 
 export default function QuizDetail() {
   // get param from route
@@ -120,16 +121,27 @@ export default function QuizDetail() {
     });
   };
 
-  const handleGenerateCode = () => {
-    const newCode = `QZ${Math.random()
-      .toString(36)
-      .substring(2, 8)
-      .toUpperCase()}`;
-    setQuiz((prev) => (prev ? { ...prev, code: newCode } : null));
+  const handleCopyId = () => {
+    navigator.clipboard.writeText(id);
     toast({
-      title: "Đã tạo mã mới",
-      description: `Mã bài thi: ${newCode}`,
+      title: "Đã sao chép",
+      description: "Mã bài thi đã được sao chép",
     });
+  };
+
+  const [resetAccessCodeLoading, setResetAccessCodeLoading] = useState(false);
+
+  const handleGenerateCode = async () => {
+    try {
+      setResetAccessCodeLoading(true);
+      const res = await quizService.resetAccessCode(id);
+      toastHelper.success("Tạo mật khẩu mới thành công!");
+      setQuiz((prev) => ({ ...prev, code: res.accessCode }));
+    } catch (error) {
+      toastHelper.error(error.message || "Có lỗi xảy ra khi tạo mật khẩu mới.");
+    } finally {
+      setResetAccessCodeLoading(false);
+    }
   };
 
   const handleCopyCode = () => {
@@ -137,7 +149,7 @@ export default function QuizDetail() {
       navigator.clipboard.writeText(quiz.code);
       toast({
         title: "Đã sao chép",
-        description: "Mã bài thi đã được sao chép",
+        description: "Mật khẩu bài thi đã được sao chép",
       });
     }
   };
@@ -272,7 +284,22 @@ export default function QuizDetail() {
         </CardHeader>
 
         <CardContent className="space-y-4">
-          {/* Mã bài thi */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">Mã bài thi</Label>
+            <div className="flex gap-2">
+              <Input value={id} readOnly className="text-sm" />
+              <Button
+                variant="outline"
+                className="min-w-[200px]"
+                onClick={handleCopyId}
+              >
+                <LinkIcon className="w-4 h-4 mr-2" />
+                Sao chép
+              </Button>
+            </div>
+          </div>
+
+          {/* MK bài thi */}
           <div className="space-y-2">
             <Label className="text-sm font-medium">Mật khẩu vào bài thi</Label>
             <div className="flex gap-2">
@@ -288,9 +315,10 @@ export default function QuizDetail() {
                 variant="outline"
                 className="min-w-[200px]"
                 onClick={handleGenerateCode}
+                disabled={resetAccessCodeLoading}
               >
                 <RefreshCw className="w-4 h-4 mr-2" />
-                Tạo mã mới
+                {resetAccessCodeLoading ? "Đang tạo..." : "Tạo mã mới"}
               </Button>
             </div>
           </div>
@@ -345,15 +373,6 @@ export default function QuizDetail() {
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold">{quiz.duration} phút</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Tổng điểm</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">{quiz.totalScore}</p>
           </CardContent>
         </Card>
       </div>
