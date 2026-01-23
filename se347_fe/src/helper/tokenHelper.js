@@ -1,15 +1,15 @@
 const tokenHelper = {
   key: "token",
   saveToken: function (token) {
-    sessionStorage.setItem(this.key, token);
+    localStorage.setItem(this.key, token);
   },
 
   getToken: function () {
-    return sessionStorage.getItem(this.key);
+    return localStorage.getItem(this.key);
   },
 
   removeToken: function () {
-    sessionStorage.removeItem(this.key);
+    localStorage.removeItem(this.key);
   },
 };
 

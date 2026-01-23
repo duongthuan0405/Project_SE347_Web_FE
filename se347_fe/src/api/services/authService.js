@@ -9,7 +9,7 @@ const authService = {
       console.log(request);
       const response = await axiosClient.post(
         "/api/Authentication/sign-up",
-        request
+        request,
       );
 
       return response;
@@ -24,7 +24,7 @@ const authService = {
 
       const response = await axiosClient.post(
         "/api/Authentication/verify",
-        request
+        request,
       );
 
       return response;
@@ -39,9 +39,18 @@ const authService = {
 
       const response = await axiosClient.post(
         "/api/Authentication/sign-in",
-        request
+        request,
       );
 
+      return response;
+    } catch (error) {
+      throw StaticClass.createError(error);
+    }
+  },
+
+  changePassword: async function (payload) {
+    try {
+      const response = await axiosClient.put("/api/Authentication", payload);
       return response;
     } catch (error) {
       throw StaticClass.createError(error);

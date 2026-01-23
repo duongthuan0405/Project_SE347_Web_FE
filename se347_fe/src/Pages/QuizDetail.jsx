@@ -68,7 +68,7 @@ export default function QuizDetail() {
       if (getQuizDetail.isError) {
       }
     },
-    [getQuizDetail.data, getQuizDetail.isError, getQuizDetail.isSuccess]
+    [getQuizDetail.data, getQuizDetail.isError, getQuizDetail.isSuccess],
   );
   const navigate = useNavigate();
 
@@ -84,7 +84,7 @@ export default function QuizDetail() {
         toastHelper.error(toggleQuestion.error.message);
       }
     },
-    [toggleQuestion.data, toggleQuestion.isError, toggleQuestion.isSuccess]
+    [toggleQuestion.data, toggleQuestion.isError, toggleQuestion.isSuccess],
   );
 
   // delete question from quiz
@@ -103,7 +103,7 @@ export default function QuizDetail() {
       deleteQuestionFromQuiz.data,
       deleteQuestionFromQuiz.isSuccess,
       deleteQuestionFromQuiz.isError,
-    ]
+    ],
   );
 
   // ---------- HANDLERS ----------
@@ -274,7 +274,7 @@ export default function QuizDetail() {
         <CardContent className="space-y-4">
           {/* Mã bài thi */}
           <div className="space-y-2">
-            <Label className="text-sm font-medium">Mã bài thi</Label>
+            <Label className="text-sm font-medium">Mật khẩu vào bài thi</Label>
             <div className="flex gap-2">
               <Input
                 value={quiz.code || ""}

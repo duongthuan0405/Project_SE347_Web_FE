@@ -13,6 +13,7 @@ import { RadioGroup, RadioItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import publicQuizService from "@/api/services/publicQuizService";
 import toastHelper from "@/helper/toastHelper";
+import LoadingOverlay from "@/ui/LoadingOverlay";
 
 export default function QuizAction() {
   const { id, participation_id } = useParams();
@@ -21,6 +22,7 @@ export default function QuizAction() {
   const [timeLeft, setTimeLeft] = useState(600); // 10 phút mặc định
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     // Fake questions
@@ -59,12 +61,15 @@ export default function QuizAction() {
   }, []);
 
   const handleSubmit = async () => {
+    setIsSubmitting(true);
     try {
       await publicQuizService.submit(participation_id);
       toastHelper.success("Nộp bài thành công");
       navigate("/");
     } catch (error) {
       toastHelper.error(error.message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -82,6 +87,7 @@ export default function QuizAction() {
 
   return (
     <div className="min-h-screen bg-accent py-6">
+      {isSubmitting && <LoadingOverlay />}
       <div className="max-w-4xl mx-auto px-4 space-y-6">
         <div className="sticky top-0 bg-primary p-4 rounded-lg flex justify-between items-center text-white z-10">
           <div>

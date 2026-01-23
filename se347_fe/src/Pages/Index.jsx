@@ -1,7 +1,13 @@
 import { GraduationCap, BookOpen, BarChart3, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useContext } from "react";
+import { AppContext } from "@/App";
+import { useNavigate } from "react-router-dom";
 
 export default function Index() {
+  const appContext = useContext(AppContext);
+  const navigate = useNavigate();
+
   return (
     <>
       <div className="min-h-screen bg-linear-to-br from-primary/10 via-accent to-primary/5">
@@ -28,7 +34,16 @@ export default function Index() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16 ">
-            <div className="bg-card p-6 rounded-xl shadow-sm hover:cursor-pointer hover:scale-105 transition-all duration-200 ease-linear">
+            <div
+              className="bg-card p-6 rounded-xl shadow-sm hover:cursor-pointer hover:scale-105 transition-all duration-200 ease-linear"
+              onClick={function () {
+                if (appContext.currentUserProfile) {
+                  navigate("/quizzes/create");
+                } else {
+                  navigate("/login");
+                }
+              }}
+            >
               <GraduationCap className="w-12 h-12 text-primary mb-4" />
               <h3 className="text-lg font-semibold mb-2">Tạo bài thi</h3>
               <p className="text-sm text-muted-foreground">
@@ -36,7 +51,16 @@ export default function Index() {
               </p>
             </div>
 
-            <div className="bg-card p-6 rounded-xl shadow-sm hover:cursor-pointer hover:scale-105 transition-all duration-200 ease-linear">
+            <div
+              className="bg-card p-6 rounded-xl shadow-sm hover:cursor-pointer hover:scale-105 transition-all duration-200 ease-linear"
+              onClick={function () {
+                if (appContext.currentUserProfile) {
+                  navigate("/question-bank");
+                } else {
+                  navigate("/login");
+                }
+              }}
+            >
               <BookOpen className="w-12 h-12 text-primary mb-4" />
               <h3 className="text-lg font-semibold mb-2">Ngân hàng câu hỏi</h3>
               <p className="text-sm text-muted-foreground">
@@ -44,7 +68,16 @@ export default function Index() {
               </p>
             </div>
 
-            <div className="bg-card p-6 rounded-xl shadow-sm hover:cursor-pointer hover:scale-105 transition-all duration-200 ease-linear">
+            <div
+              className="bg-card p-6 rounded-xl shadow-sm hover:cursor-pointer hover:scale-105 transition-all duration-200 ease-linear"
+              onClick={function () {
+                if (appContext.currentUserProfile) {
+                  navigate("/dashboard");
+                } else {
+                  navigate("/login");
+                }
+              }}
+            >
               <BarChart3 className="w-12 h-12 text-primary mb-4" />
               <h3 className="text-lg font-semibold mb-2">Thống kê chi tiết</h3>
               <p className="text-sm text-muted-foreground">
@@ -52,7 +85,16 @@ export default function Index() {
               </p>
             </div>
 
-            <div className="bg-card p-6 rounded-xl shadow-sm hover:cursor-pointer hover:scale-105 transition-all duration-200 ease-linear">
+            <div
+              className="bg-card p-6 rounded-xl shadow-sm hover:cursor-pointer hover:scale-105 transition-all duration-200 ease-linear"
+              onClick={function () {
+                if (appContext.currentUserProfile) {
+                  navigate("/dashboard");
+                } else {
+                  navigate("/login");
+                }
+              }}
+            >
               <Users className="w-12 h-12 text-primary mb-4" />
               <h3 className="text-lg font-semibold mb-2">Mời tham gia</h3>
               <p className="text-sm text-muted-foreground">

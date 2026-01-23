@@ -24,7 +24,7 @@ const InternalQuestionForm = ({ question, onUpdate, isDisabled }) => {
 
   const handleOptionChange = (index, value) => {
     const newAnswers = localData.answers.map((option, i) =>
-      i === index ? { ...option, content: value } : option
+      i === index ? { ...option, content: value } : option,
     );
     handleChange({ answers: newAnswers });
   };
@@ -58,7 +58,7 @@ const InternalQuestionForm = ({ question, onUpdate, isDisabled }) => {
               name={`radio_${localData.id}`}
               className="w-full flex flex-col space-y-4"
               currentSelectedValue={localData.answers?.findIndex(
-                (a) => a.isCorrectAnswer
+                (a) => a.isCorrectAnswer,
               )}
               onChange={(value) => {
                 const newAnswers = localData.answers.map((ans, index) => ({
@@ -105,7 +105,12 @@ const InternalQuestionForm = ({ question, onUpdate, isDisabled }) => {
 };
 
 // --- COMPONENT CHÍNH (QuestionFormDialog) ---
-export function QuestionFormDialog({ isOpen, onClose, editingQuestion }) {
+export function QuestionFormDialog({
+  isOpen,
+  onClose,
+  editingQuestion,
+  setClose,
+}) {
   const [category, setCategory] = useState("");
   const [formList, setFormList] = useState([]);
   const [isPending, setIsPending] = useState(false); // Thêm state quản lý loading
@@ -241,7 +246,7 @@ export function QuestionFormDialog({ isOpen, onClose, editingQuestion }) {
                       className="text-red-500 h-8 text-xs font-bold hover:bg-red-50"
                       onClick={() =>
                         setFormList(
-                          formList.filter((f) => f.id !== formData.id)
+                          formList.filter((f) => f.id !== formData.id),
                         )
                       }
                     >

@@ -15,7 +15,7 @@ const questionBankService = {
   async deleteQuestionFromBank(questionId) {
     try {
       const response = await axiosClient.delete(
-        `/api/QuestionBank/${questionId}`
+        `/api/QuestionBank/${questionId}`,
       );
       return response;
     } catch (error) {
@@ -26,6 +26,27 @@ const questionBankService = {
   async createManyQuestions(questions) {
     try {
       const response = await axiosClient.post(`/api/QuestionBank`, questions);
+      return response;
+    } catch (error) {
+      throw StaticClass.createError(error);
+    }
+  },
+
+  async getDetailQuestionFromBank(questionId) {
+    try {
+      const response = await axiosClient.get(`/api/QuestionBank/${questionId}`);
+      return response;
+    } catch (error) {
+      throw StaticClass.createError(error);
+    }
+  },
+
+  async updateQuestionInBank(questionId, updatedQuestion) {
+    try {
+      const response = await axiosClient.put(
+        `/api/QuestionBank/${questionId}`,
+        updatedQuestion,
+      );
       return response;
     } catch (error) {
       throw StaticClass.createError(error);

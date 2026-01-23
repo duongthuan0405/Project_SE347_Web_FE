@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils"; // hoặc thay bằng className bình thường
 
 // Dialog root
-export function Dialog({ isOpen, onClose, children }) {
+export function Dialog({ isOpen, onClose, children, className }) {
   if (!isOpen) return null;
 
   return createPortal(
@@ -15,11 +15,16 @@ export function Dialog({ isOpen, onClose, children }) {
       />
 
       {/* Content */}
-      <div className="relative z-10 w-full max-w-lg rounded-lg bg-white p-6 shadow-lg">
+      <div
+        className={cn(
+          "relative z-10 w-full max-w-lg rounded-lg bg-white p-6 shadow-lg",
+          className,
+        )}
+      >
         {children}
       </div>
     </div>,
-    document.body
+    document.body,
   );
 }
 
@@ -29,7 +34,7 @@ export function DialogHeader({ className, children, ...props }) {
     <div
       className={cn(
         "flex flex-col space-y-1.5 text-center sm:text-left",
-        className
+        className,
       )}
       {...props}
     >
@@ -44,7 +49,7 @@ export function DialogFooter({ className, children, ...props }) {
     <div
       className={cn(
         "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 mt-4",
-        className
+        className,
       )}
       {...props}
     >
@@ -59,7 +64,7 @@ export function DialogTitle({ className, children, ...props }) {
     <h3
       className={cn(
         "text-lg font-semibold leading-none tracking-tight",
-        className
+        className,
       )}
       {...props}
     >

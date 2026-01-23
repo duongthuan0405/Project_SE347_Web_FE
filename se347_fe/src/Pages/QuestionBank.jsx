@@ -2,6 +2,7 @@ import {
   useDeleteQuestionFromBank,
   useGetMyQuestionBank,
 } from "@/api/data_hooks/questionBankHook";
+import QuestionDetailFromBankDialog from "@/components/project_components/questionDetailFromBankDialog";
 import { QuestionFormDialog } from "@/components/project_components/questionFormDialog";
 import { Button } from "@/components/ui/button";
 
@@ -35,6 +36,8 @@ function QuestionBank() {
 
   const [searchParamsTrigger, setSearchParamsTrigger] = useState(searchParams);
   const [showQuestionForm, setShowQuestionForm] = useState(false);
+  const [selectedQuestionId, setSelectedQuestionId] = useState(null);
+  const [openDetail, setOpenDetail] = useState(false);
 
   function handleOnChangeSearchParams(e) {
     setSearchParams(function (p) {
@@ -60,7 +63,7 @@ function QuestionBank() {
       deleteQuestionFromBank.isError,
       deleteQuestionFromBank.isSuccess,
       deleteQuestionFromBank.data,
-    ]
+    ],
   );
 
   function handleOnDeleteQuestion(questionId) {
@@ -69,7 +72,7 @@ function QuestionBank() {
 
   const getQuestionBank = useGetMyQuestionBank(
     searchParamsTrigger.keyword,
-    searchParamsTrigger.category
+    searchParamsTrigger.category,
   );
 
   useEffect(
@@ -81,7 +84,7 @@ function QuestionBank() {
         toastHelper.error(getQuestionBank.error.message);
       }
     },
-    [getQuestionBank.isSuccess, getQuestionBank.isError, getQuestionBank.data]
+    [getQuestionBank.isSuccess, getQuestionBank.isError, getQuestionBank.data],
   );
 
   return (
@@ -200,7 +203,7 @@ function QuestionBank() {
                             key={index}
                             className="border-b-4 border-white bg-black/10"
                           >
-                            <TableCell className="font-medium overflow-hidden whitespace-nowrap text-ellipsis">
+                            <TableCell className="font-medium overflow-hidden whitespace-nowrap text-ellipsis w-[70%] max-w-[800px]">
                               {question.content}
                             </TableCell>
                             <TableCell className="text-center">
@@ -212,8 +215,9 @@ function QuestionBank() {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  onClick={function () {
-                                    alert("Xem chi tiết");
+                                  onClick={() => {
+                                    setSelectedQuestionId(question.id);
+                                    setOpenDetail(true);
                                   }}
                                 >
                                   <Eye className="w-4 h-4" />
@@ -257,6 +261,13 @@ function QuestionBank() {
           </CardContent>
         </Card>
       )}
+
+      <QuestionDetailFromBankDialog
+        isOpen={openDetail}
+        onClose={() => setOpenDetail(false)}
+        questionId={selectedQuestionId}
+        setClose={setOpenDetail}
+      />
     </div>
   );
 }
